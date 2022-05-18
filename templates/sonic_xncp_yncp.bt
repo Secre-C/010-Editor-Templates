@@ -57,6 +57,7 @@ typedef struct
     if ( isBigEndian ) BigEndian();
 } TNNChunkHeader;
 
+
 typedef struct
 {
     SetRandomBackColor();
@@ -180,7 +181,7 @@ typedef struct
     Assert( Field0C == 0 );
     Assert( RootNodeOffset.Offset == 0x20 );
     Assert( ProjectName.Offset == 0x38 );
-    Assert( DXLSignature == 0x2E44584C );
+//    Assert( DXLSignature == 0x2E44584C );
     Assert( FontListOffset.Offset == 0x40 );
 
     if ( RootNodeOffset.isValid )
@@ -248,31 +249,31 @@ typedef struct
 typedef struct
 {
     SetRandomBackColor();
-    /* 00 */ u32 UIControlCount;
-    /* 04 */ TNNOffset UIControlTableOffset(0);
-    /* 08 */ TNNOffset UIControlIDTableOffset(0);
+    /* 00 */ u32 SceneCount;
+    /* 04 */ TNNOffset SceneTableOffset(0);
+    /* 08 */ TNNOffset SceneIDTableOffset(0);
     /* 0C */ u32 NodeCount;
     /* 10 */ TNNOffset NodeListOffset(0);
     /* 14 */ TNNOffset NodeDictionaryOffset(0);
 
-    if ( UIControlTableOffset.isValid )
+    if ( SceneTableOffset.isValid )
     {
         SetRandomBackColor();
-        FSeek( UIControlTableOffset.absPosition );
+        FSeek( SceneTableOffset.absPosition );
         struct
         {
-            struct TUIControlOffset UIControl[ UIControlCount ];
-        } UIControls;
+            struct TSceneOffset Scene[ SceneCount ];
+        } Scenes;
     }
 
-    if ( UIControlIDTableOffset.isValid )
+    if ( SceneIDTableOffset.isValid )
     {   
         SetRandomBackColor();
-        FSeek( UIControlIDTableOffset.absPosition );
+        FSeek( SceneIDTableOffset.absPosition );
         struct
         {
-            struct TUIControlID UIControlID[ UIControlCount ];
-        } UIControlIDTable;
+            struct TSceneID SceneID[ SceneCount ];
+        } SceneIDTable;
     }
 
 
@@ -300,8 +301,8 @@ typedef struct
 typedef struct
 {
     /* 00 */ TNNStringOffset NameOffset(0);
-    /* 04 */ u32 Index; // Index into the UIControl data array
-} TUIControlID <optimize=false>;
+    /* 04 */ u32 Index; // Index into the Scene data array
+} TSceneID <optimize=false>;
 
 typedef struct
 {
@@ -312,10 +313,10 @@ typedef struct
     {
         FPush();
         FSeek( Offset.absPosition );
-        struct TUIControl Data;
+        struct TScene Data;
         FPop();
     }
-} TUIControlOffset <optimize=false>;
+} TSceneOffset <optimize=false>;
 
 u32 CountSetBits( u32 value )
 {
@@ -335,7 +336,7 @@ typedef struct
     SetRandomBackColor();
     /* 00 */ u32 Field00; // if this is below 3, the element doesn't show up
     /* 04 */ f32 ZIndex; // no change (info_time)
-    /* 08 */ f32 Field08; // no change (info_time)
+    /* 08 */ f32 AnimationFramerate; // no change (info_time)
     /* 0C */ u32 Field0C; // no change (info_time)
     /* 10 */ f32 Field10; // no change (info_time)
     /* 14 */ u32 Data1Count; // no change (info_time)
@@ -553,7 +554,7 @@ typedef struct
     if ( AnimationCastTableOffset.isValid )
     {
         // We apologise for the fault in the subtitles. 
-        // Those responsible have been sacked. Mynd you, møøse bites Kan be pretti nasti... 
+        // Those responsible have been sacked. Mynd you, mÃ¸Ã¸se bites Kan be pretti nasti... 
         // We apologise again for the fault in the subtitles. 
         // Those responsible for sacking the people who have just been sacked have been sacked.
 
@@ -620,8 +621,8 @@ typedef struct
                                                                             if ( DataOffset.isValid )
                                                                             {
                                                                                 FPush();
-                                                                                FSeek( DataOffset.absPosition );
-                                                                        
+                                                                                FSeek( DataOffset.absPosition );                                                                                                       
+
                                                                                 local u32 flags = 
                                                                                     AnimationKeyFrameDataList.AnimationKeyFrameData[animationIndex].GroupAnimationDataList.
                                                                                     GroupAnimationData[groupIndex].CastAnimationDataList.CastAnimationData[groupCastIndex].Flags;
@@ -698,7 +699,7 @@ typedef struct
     }
 
     FPop();
-} TUIControl <optimize=false>;
+} TScene <optimize=false>;
 
 /*
     TUICastGroup
@@ -760,48 +761,46 @@ typedef struct
         struct
         {
             u32 Field00; // info_rings doesnt show if not 2 or 3
-            u32 Field04; // 0 in info_rings, but if 1 a white box shows in the center of the screen
+            u32 DrawType; // None (0), Sprite (1), Font (2)
             u32 IsEnabled; // info_rings doesnt show if not 1
-            TVector2 Field0C; // [-0.00625,-0.01111111], doesnt affect info_rings
-            TVector2 Field14; // [-0.00625,-0.01111111], doesnt affect info_rings
-            TVector2 Field1C; // [-0.00625,-0.01111111], doesnt affect info_rings
-            TVector2 Field24; // [-0.00625,-0.01111111], doesnt affect info_rings
-            u16 Field2C; // 7FFFh, doesnt affect info_rings
-            u16 Field2E; // 0
-            TNNOffset Field30(0);
-            u16 Field34; // 7FFFh, doesnt affect info_rings
-            u16 Field36; // 0
+            TVector2 TopLeft; // [-0.00625,-0.01111111], doesnt affect info_rings
+            TVector2 BottomLeft; // [-0.00625,-0.01111111], doesnt affect info_rings
+            TVector2 TopRight; // [-0.00625,-0.01111111], doesnt affect info_rings
+            TVector2 BottomRight; // [-0.00625,-0.01111111], doesnt affect info_rings
+            u32 Field2C; // 7FFFh, doesnt affect info_rings
+            TNNOffset CastInfoOffset(0);
+            u32 Field34; // 7FFFh, doesnt affect info_rings
             u32 Field38; // 51000h, Bitfield, doesnt affect info_rings
             u32 Field3C; // 0x20, info_rings unaffected
-            TNNOffset Field40(0);
+            TNNOffset CastMaterialInfoOffset(0);
             TNNStringOffset FontCharactersOffset(0); // eg: "01234567", string or null terminated, cant find a count for this
             TNNStringOffset FontNameOffset(0); // eg: "font_count1"
-            u32 Field4C; // 0, BB 19 99 9A, 2 half floats?
+            u32 FontSpacingCorrection; // 0, BB 19 99 9A, 2 half floats?
             u32 Width; // [0x10, 0x98] info_rings unaffected
             u32 Height; // [0x10, 0x1B] info_rings unaffected
             u32 Field58; // [6], info_rings unaffected
-            u32 Field5C; // [0, 3], info_rings unaffected
+            u32 ScaleType; // [0, 3], info_rings unaffected, 00 for resolution based scaling, 01 for vertical, 02 for horizontal, and 03 for stretched HUD
             TVector2 Offset; // X = left Y = top
             f32 Field68; // -400, info_rings unaffected
             f32 Field6C; // -1, info_rings unaffected
-            u32 Field70; // [0, 2], info_rings unaffected
+            u32 ScaleType2; // same as offset 0x5C.
 
 //            Assert( Field00 == 3 );
             //failed: Assert( Field04 == 1 );
             //Assert( IsVisible == 1 );
         
-//            Assert( Field30.absPosition - Field40.absPosition == 0x80 );
+//            Assert( CastInfoOffset.absPosition - CastMaterialInfoOffset.absPosition == 0x80 );
 
             FPush();
 
-            if ( Field30.isValid )
+            if ( CastInfoOffset.isValid )
             {
-                FSeek( Field30.absPosition );
+                FSeek( CastInfoOffset.absPosition );
                 struct
                 {
                     f32 Field00; // info_rings doesnt show if not 0 
                     // -0.3125, info_rings unaffected
-                    TVector2 Offset; // higher value = lower position
+                    TVector2 Translation; // higher value = lower position
                     f32 Rotation; // 0, info_rings unaffected
                     TVector2 Scale;
                     f32 Field18;
@@ -813,12 +812,12 @@ typedef struct
                     u32 Field30; // 0, info_rings unaffected
                     u32 Field34; // 0, info_rings unaffected
                     u32 Field38; // 0, info_rings unaffected
-                } Field30Data;
+                } CastInfo;
             }
 
-            if ( Field40.isValid )
+            if ( CastMaterialInfoOffset.isValid )
             {
-                FSeek( Field40.absPosition );
+                FSeek( CastMaterialInfoOffset.absPosition );
                 struct
                 {
                     s32 TextureIndex;
@@ -853,7 +852,7 @@ typedef struct
                     s32 field_74;
                     s32 field_78;
                     s32 field_7C;
-                } Field40Data;
+                } CastMaterialInfo;
             }
 
             FPop();
