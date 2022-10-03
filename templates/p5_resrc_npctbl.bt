@@ -1,3 +1,15 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File:
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: Persona 5
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
 #include "common/include.h"
 
 BigEndian();

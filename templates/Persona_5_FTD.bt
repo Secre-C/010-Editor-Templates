@@ -1,14 +1,6 @@
 //------------------------------------------------
 //--- 010 Editor v8.0 Binary Template
-//
-//      File: p5_ftd.bt
-//   Authors: TGE, Lillian Goulston, SecreC.,
-//   Version: 1.1
-//   Purpose: Parse Persona 5 FTD files
-//  Category: Persona 5
 // File Mask: *.ftd, *.ctd
-//  ID Bytes:
-//   History:
 //------------------------------------------------
 
 //---------------------------------------------
@@ -16,46 +8,30 @@
 //---------------------------------------------
 #include "common/include.h"
 #include "common/p5.h"
-#include "p5_enums_ftd.bt"
+#include "Persona_5_ENUMS_FTD.bt"
+#include "Persona_5_ENUMS_ITEM.bt"
 
 // Define structures
 
-local int index = 0;
-local int isShop;
+typedef struct 
+{
+  u16 EncounterID;
+  u8 Weight;
+  u8 Padding; // always 0
+} ENC <optimize=false, read=Str( "%d"+" Encounter: "+"%d", Weight, EncounterID )>;
 
 typedef struct
 {
-    ConfidantFunction_Type FunctionType <name = "Function Type">;
-    short Rank <name = "Unlocks at Rank:">;
-    ConfidantFunction Function <name = "Confidant Function">;
-    short Unknown <name = "Unknown">;
-} Table_cmmFunction[ 10 ] <name = "Confidant Functions">;
+  u32 Flag <format=hex>;
+  TboxIndex Items[ 6 ];
+} fldObj <size=0x10, optimize=false, read=fldObj_Read>;
 
-typedef struct
+string fldObj_Read( fldObj &o )
 {
-    ConfidantFunction_Type FunctionType <name = "Function Type">;
-    ConfidantFunction_OrganizedByArcana FunctionByArcana <name = "Confidant Function">;
-} Table_cmmFunctionInfo <name = "Confidant Function Info">;
-
-typedef struct
-{
-    PartyMember Member <name = "Party Member">;
-    short Rank <name = "Rank">;
-    BattleSkill Skill <name = "Battle Skill">;
-    short Unknown <name = "Unknown">;
-} Table_cmpPsCoopSkillTable <name = "Party Confidant Skill Table">;
-
-typedef struct
-{
-    ItemType Unknown<format = hex, name = "Item Category">;
-    u8 Consumable<name = "Consumable ID">;
-} Table_fclItemLineUp <name = "Clinic Consumable">;
-
-typedef struct
-{
-    ItemType Unknown<format = hex, name = "Item Category">;
-    u8 Accesory<name = "Accesory ID">;
-} Table_fclItemLineUpAcc <name = "Clinic Accesory">;
+  local string s;
+  SPrintf( s, "0x%08x", o.Flag );
+  return s;
+}
 
 typedef struct
 {
@@ -66,6 +42,86 @@ typedef struct
     ItemizationType Type : 4 <name = "Required Item Type">;
     ushort Item : 12 <name = "Required Item">;
 } Table_fclCombElectItem <name = "Persona Itemization">;
+
+typedef struct
+{
+    u8  field_0;
+    u8  field_1[ 7 ];
+    u16 AmbushEncounter[ 8 ];
+    ENC field_18[ 13 ];
+    ENC PinchEncounter[ 5 ];
+    ENC field_60[ 5 ];
+    ENC field_74[ 5 ];
+    ENC StrongEncounter[ 5 ];
+    ENC StrongPinchEncounter[ 5 ];
+    ENC RareEncounter[ 5 ];
+    ENC ReaperEncounter[ 1 ];
+    u32 Padding;
+} Table_Encounter <name = "Dungeon Encounter Block">;
+
+
+typedef struct( string fileName )
+{
+    SetRandomBackColor();
+    local u32 tableStart = FTell();
+
+    // Detect endianness
+    BigEndian();
+    local u32 magic = ReadUInt( tableStart + 4 );
+    if ( magic != 0x46544430 )
+    {
+        if ( magic == 0x30445446 )
+        {
+            LittleEndian();
+        }
+        else
+        {
+            Assert( false, "Invalid magic" );
+        }
+    }
+
+    u32 Field00 <name = "Field 00">;
+    u32 Magic <name = "Magic">;
+    u32 FileSize <name = "File Size">;
+    u16 DataType <name = "Data Type">;
+    u16 DataCount <name = "Data Count">;
+    u32 DataOffsets[ DataCount ] <name = "Data Offsets">;
+
+    local u32 x;
+    local u32 y;
+    for ( x = 0; x < DataCount; ++x )
+    {
+        FSeek( tableStart + DataOffsets[x] );
+
+        if ( DataType == 0 ) struct FtdList List( fileName );
+        else if ( DataType == 1 ) struct FtdString Data;
+    }
+} FtdTable <name = "FTD Table">;
+
+typedef struct( string fileName )
+{
+    SetRandomBackColor();
+
+    u32 Field00 <name = "Field 00">;        Assert( Field00 == 0 );
+    u32 DataSize <name = "Data Size">;
+    u32 EntryCount <name = "Entry Count">;
+    FtdListType EntryType <name = "Entry Type">;
+    u16 Field0E <name = "Field 0E">;
+
+    if ( EntryCount > 0 )
+    {
+        if ( EntryType == FtdListType_DataEntries )
+        {
+            local u32 entrySize = DataSize / EntryCount;
+            //Assert( ( entrySize * EntryCount ) == DataSize );
+            struct FtdListEntry Entry( entrySize, fileName )[ EntryCount ] <name = "Entry">;
+        }
+        else if ( EntryType == FtdListType_EmbeddedFtd )
+        {
+            FtdTable Table( fileName );
+        }
+    }
+} FtdList <name = "List">;
 
 typedef struct
 {
@@ -86,6 +142,16 @@ typedef struct
 	u16 Field3C0;
 	u16 Field3C2;
 }fldMapTable;
+
+typedef struct
+{
+	u32 Field20;
+	u32 DataSize;
+	u32 EntryCount;
+	u16 EntryType;
+	u16 Field2E;
+	fldMapTable data[EntryCount];
+}fldWholeMapList;
 
 typedef struct
 {
@@ -153,12 +219,12 @@ typedef struct
 	u16 FieldMinor <name = "Field Minor ID">;;
 	u16 field2c;
 	u16 field2e;
-	s32 xStartOffset <name = "X Position Start Add Translate">;
-	s32 yStartOffset <name = "Y Position Start Add Translate">;
-	s32 zStartOffset <name = "Z Position Start Add Translate">;
-	s32 xEndOffset <name = "X Position End Translate">;
-	s32 yEndOffset <name = "Y Position End Translate">;
-	s32 zEndOffset <name = "Z Position End Translate">;
+	s32 xStartOffset <name = "X Position Start Offset">;
+	s32 yStartOffset <name = "Y Position Start Offset">;
+	s32 xStartOffset <name = "Z Position Start Offset">;
+	s32 xEndOffset <name = "X Position End Offset">;
+	s32 yEndOffset <name = "Y Position End Offset">;
+	s32 xEndOffset <name = "Z Position End Offset">;
 	u16 field48;
 	u16 field4a;
 	u16 field4c;
@@ -181,68 +247,6 @@ typedef struct
 	u16 field6e;
 }fldWireAnimDataTable <name = "Dramatic Grappling Hook Sequence Parameters">;
 
-typedef struct( string fileName )
-{
-    SetRandomBackColor();
-    local u32 tableStart = FTell();
-
-    // Detect endianness
-    BigEndian();
-    local u32 magic = ReadUInt( tableStart + 4 );
-    if ( magic != 0x46544430 )
-    {
-        if ( magic == 0x30445446 )
-        {
-            LittleEndian();
-        }
-        else
-        {
-            Assert( false, "Invalid magic" );
-        }
-    }
-
-    u32 Field00 <name = "Field 00">;
-    u32 Magic <name = "Magic">;
-    u32 FileSize <name = "File Size">;
-    u16 DataType <name = "Data Type">;
-    u16 DataCount <name = "Data Count">;
-    u32 DataOffsets[ DataCount ] <name = "Data Offsets">;
-
-    local u32 x;
-    local u32 y;
-    for ( x = 0; x < DataCount; ++x )
-    {
-        FSeek( tableStart + DataOffsets[x] );
-
-        if ( DataType == 0 ) struct FtdList List( fileName );
-        else if ( DataType == 1 ) struct FtdString Data;
-    }
-} FtdTable <name = "FTD Table">;
-
-typedef struct( string fileName )
-{
-    SetRandomBackColor();
-
-    u32 Field00 <name = "Field 00">;        Assert( Field00 == 0 );
-    u32 DataSize <name = "Data Size">;
-    u32 EntryCount <name = "Entry Count">;
-    FtdListType EntryType <name = "Entry Type">;
-    u16 Field0E <name = "Field 0E">;
-
-    if ( EntryCount > 0 )
-    {
-        if ( EntryType == FtdListType_DataEntries )
-        {
-            local u32 entrySize = DataSize / EntryCount;
-            Assert( ( entrySize * EntryCount ) == DataSize );
-            struct FtdListEntry Entry( entrySize, fileName )[ EntryCount ] <name = "Entry">;
-        }
-        else if ( EntryType == FtdListType_EmbeddedFtd )
-        {
-            FtdTable Table( fileName );
-        }
-    }
-} FtdList <name = "List">;
 
 string fldLmapStationTableRead( fldLmapStation &o )
 {
@@ -262,6 +266,7 @@ string fldWireAnimDataTableRead( fldWireAnimDataTable &o )
 {
 	local string s;
 	SPrintf( s, "ID %d: Field %03d_%03d", o.SequenceId, FieldMajor, FieldMinor );
+	return s;
 }
 
 typedef struct( u32 entrySize, string fileName )
@@ -270,28 +275,61 @@ typedef struct( u32 entrySize, string fileName )
 
     switch ( fileName )
     {
-        case "cmmFunctionInfoTable":
-            Table_cmmFunctionInfo Data;
+        case "datEncountPack":
+            u8 field_0;
+            u8 UnusedSlot[ 7 ];
+            u16 AmbushList[ 8 ];
+            ENC NormalEncounter[ 13 ];
+            ENC NormalPinchEncounter[ 5 ];
+            ENC WhatDo[ 5 ];
+            ENC TheseOnesDo[ 5 ];
+            ENC StrongEncounter[ 5 ];
+            ENC StrongPinchEncounter[ 5 ];
+            ENC TreasureEncounter[ 5 ];
+            ENC ReaperEncounter[ 1 ];
+            u32 Padding;
+            //Printf("Field0: %Lx\n", field_0);
             break;
 
-        case "cmmFunctionTable":
-            Table_cmmFunction Data;
+        case "fldObjFlag":
+            fldObj Objects[10];
             break;
 
-        case "cmpPsCoopSkillTable":
-            Table_cmpPsCoopSkillTable Data;
+        case "datTBoxRnd":
+              struct
+              {
+                struct
+                {
+                  u8 Rate;
+                  u8 Type;
+                  TboxIndex ItemEntry <name = "Item">;
+                } Choices[ 10 ] <optimize=false>;
+              } SearchItem[ 4 ] <optimize=false>;
             break;
 
-        case "fclItemLineUpTable":
-            Table_fclItemLineUp Consumables;
+        case "datTBox":
+            //u16 Item;
+            ItemIndex ItemEntry <name = "Item">;
+            u8 ItemCount;
+            u8 Padding<hidden=true>;
             break;
 
-        case "fclItemLineUpAccTable":
-            Table_fclItemLineUpAcc Accesories;
+        case "fldDngPack":
+            u16 EncountPackEntry;
+            u16 ObjFlagEntry;
+            u16 TboxRndEntry;
+            u8 Unknown2[10];
             break;
 
-        case "fclCombElectItemTable":
-            Table_fclCombElectItem Itemization;
+        case "fldPlayerSpeed":
+            short FieldMajor;
+            short FieldMinor;
+            short WalkSpeed;
+            short RunSpeed;
+            u8 AccelFrames;
+            u8 DecelFrames;
+            u8 StaticTurnFrames;
+            u8 Padding;
             break;
 			
 		case "fldWholeMapTable":
@@ -310,25 +348,64 @@ typedef struct( u32 entrySize, string fileName )
 			cmmFormat Data;
 			
 		case "fldWireAnimData":
-			fldWireAnimDataTable Data;
+			u16 SequenceId <name = "Wire Sequence ID">;
+			u16 AnimationID <name = "Joker Field Animation Minor ID">;
+			u16 field04;
+			u16 field06;
+			u16 field08;
+			u16 field0a;
+			u16 field0c;
+			u16 CueID <name = "Wire Sound Effect Cue ID">;
+			u16 field10;
+			u16 field12;
+			u16 field14;
+			u16 field16;
+			u16 field18;
+			u16 field1a;
+			u16 field1c;
+			u16 field1e;
+			u16 CameraMajor <name = "Field Camera Major ID">;
+			u16 CameraMinor <name = "Field Camera Minor ID">;
+			u16 field24;
+			u16 WireAnimID <name = "Grappling Hook (it6400_001.GMD) Animation ID">;
+			u16 FieldMajor <name = "Field Major ID">;
+			u16 FieldMinor <name = "Field Minor ID">;;
+			u16 field2c;
+			u16 field2e;
+			s32 xStartOffset <name = "X Position Start Offset">;
+			s32 yStartOffset <name = "Y Position Start Offset">;
+			s32 xStartOffset <name = "Z Position Start Offset">;
+			s32 xEndOffset <name = "X Position End Offset">;
+			s32 yEndOffset <name = "Y Position End Offset">;
+			s32 xEndOffset <name = "Z Position End Offset">;
+			u16 field48;
+			u16 field4a;
+			u16 field4c;
+			u16 field4e;
+			u16 field50;
+			u16 field52;
+			u16 field54;
+			u16 field56;
+			u16 field58;
+			u16 field5a;
+			u16 field5c;
+			u16 field5e;
+			u16 field60;
+			u16 field62;
+			u16 field64;
+			u16 field66;
+			u16 field68;
+			u16 field6a;
+			u16 field6c;
+			u16 field6e;
 			break;
-			
+
         default:
             u8 Data[ entrySize ];
             break;
     }
 
-} FtdListEntry <read=FtdListEntryToString, write=FtdListEntryFromString, optimize=false>;
-
-string FtdListEntryToString( struct FtdListEntry& entry )
-{
-    return entry.Data;
-}
-
-void FtdListEntryFromString( struct FtdListEntry& entry, string value )
-{
-    entry.Data = value;
-}
+} FtdListEntry <optimize=false>;
 
 // Field strings
 typedef struct

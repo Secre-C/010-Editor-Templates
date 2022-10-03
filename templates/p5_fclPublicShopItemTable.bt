@@ -5,12 +5,13 @@
 //   Authors: SecreC.
 //   Version: 1.0
 //   Purpose: 
-//  Category: 
+//  Category: Persona 5
 // File Mask: fclPublicShopItemTable.ftd
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 #include "common/include.h"
+#include "common/p5.h"
 #include "p5_enums_ftd.bt"
 
 local int index = -1;
@@ -55,19 +56,19 @@ typedef struct
 	u8 Field09;
 	u8 Field0A<name = "Quantity Available">;
 	u8 Field0B;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	u8 Field0C;
-	s32 Bitflag<name = "Bitflag Requirement">;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	s8 Field0C;
+	Bitflag bitflag<name = "Bitflag Requirement">;
 	u8 Field0C;
 	u8 Field0C;
 	u8 Field0C;

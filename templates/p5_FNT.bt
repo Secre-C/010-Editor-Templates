@@ -5,6 +5,7 @@
 //------------------------------------------------
 
 #include "common/include.h"
+#include "common/p5.h"
 
 LittleEndian();
 
@@ -54,8 +55,8 @@ typedef struct
 	s16 Field_GAP_MinorID;                  // Specifies Field "A" .GAP 
 	s16 Animation_Index;                    // Specifies .GAP Animation Offset
 	s32 Hit_Procedure_Index;                // Points to a numbered procedure in the .BF on Hit
-	s32 Disabling_Bitflag;                  // Specifies a BitFlag that disables the FNT Entry if TRUE
-	s32 Disabling_Bitflag2;                 // Specifies a BitFlag that disables the FNT Entry if TRUE
+	Bitflag Disabling_Bitflag;                  // Specifies a BitFlag that disables the FNT Entry if TRUE
+    Bitflag Disabling_Bitflag2;                 // Specifies a BitFlag that disables the FNT Entry if TRUE
 	f32 Hit_Procedure_Radius;               // Specifies the radius of the invisible Hit Prompt Trigger
 	f32 AutoHit_Procedure_Radius;           // Specifies the radius of the Invincible Rainbow Arrow ( Bit! Get! A-Set! )
 	s32 AutoHit_Procedure_Index;            // Points to a numbered procedure in the .BF when in Radius

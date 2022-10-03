@@ -5,12 +5,13 @@
 //   Authors: 
 //   Version: 
 //   Purpose: 
-//  Category: 
+//  Category: Persona 5
 // File Mask: 
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 #include "common/include.h"
+#include "common/p5.h"
 
 enum<short> travelType
 {

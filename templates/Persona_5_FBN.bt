@@ -1,19 +1,8 @@
 //------------------------------------------------
 //--- 010 Editor v8.0 Binary Template
-//
-//      File: p5_fbn.bt
-//   Authors: TGE, Cherry
-//   Version: 1.0
-//   Purpose: Parse Persona 5 FBN files
-//  Category: Persona 5
 // File Mask: *.fbn
-//  ID Bytes: 
-//   History: 
-//------------------------------------------------
+//---------------------------------------------
 
-//---------------------------------------------
-// Primitive types
-//---------------------------------------------
 typedef char bool;
 typedef char s8;
 typedef uchar u8;
@@ -27,9 +16,6 @@ typedef uint64 u64;
 typedef float f32;
 typedef double f64;
 
-//---------------------------------------------
-// Random color
-//---------------------------------------------
 local uint __RandomSeed = 0xDEADBABE;
 local uint __RandomBit = 0;
 local uint __RandomCount = 0;
@@ -56,7 +42,6 @@ void SetRandomBackColor()
     SetBackColor( RandomColor() );
 }
 
-// Generate s32 from FourCC in string format
 s32 FourCC( string str )
 {
     return (s32)str[0] << 24 | (s32)str[1] << 16 | (s32)str[2] << 8 | (s32)str[3];
@@ -109,9 +94,15 @@ typedef enum<s32>
     FbnListType_Trigger = 1,
     FbnListType_Entrance = 4,
     FbnListType_Hit = 5,
+    FbnListType_Chest = 9,
+    FbnListType_Cover = 10,
+    FbnListType_Shadow = 11,
     FbnListType_Npc = 14,
-    FbnListType_Trigger2 = 19,
-    FbnListType_Trigger3 = 22
+    FbnListType_SearchObject = 18,
+    FbnListType_SearchObjectHit = 19,
+    FbnListType_VoiceHit = 22,
+    FbnListType_GrappleObject = 25,
+    FbnListType_GrappleTrigger = 26
 } FbnListType;
 
 typedef struct
@@ -165,16 +156,17 @@ typedef struct( s32 type )
         case FbnListType_Trigger: struct FbnTriggerVolume Entry[ EntryCount ]; break;
         case FbnListType_Entrance: struct FbnEntrance Entry[ EntryCount ]; break;
         case FbnListType_Hit: struct FbnHitDefinition Entry[ EntryCount ]; break;
-        case 8: struct FbnBlock8Entry Entry[ EntryCount ]; break;
-        case 9: struct FbnBlock9Entry Entry[ EntryCount ]; break;
-        case 10: struct FbnBlock10Entry Entry[ EntryCount ]; break;
-        case 11: struct FbnBlock11Entry Entry[ EntryCount ]; break;
+        case 8: struct FbnBlock8Entry Entry[ EntryCount ]; break; //I will save you for another day, my child
+        case FbnListType_Chest: struct FbnTreasureChest Entry[ EntryCount ]; break;
+        case FbnListType_Cover: struct FbnCoverPoints Entry[ EntryCount ]; break;
+        case FbnListType_Shadow: struct FbnShadow Entry[ EntryCount ]; break;
         case FbnListType_Npc: struct FbnNpc Entry[ EntryCount ]; break;
-        case 18: struct FbnBlock18Entry Entry[ EntryCount ]; break;
-        case FbnListType_Trigger2: struct FbnTriggerVolume Entry[ EntryCount ]; break;
-        case FbnListType_Trigger3: struct FbnTriggerVolume Entry[ EntryCount ]; break;
-        case 21: struct FbnBlock21Entry Entry[ EntryCount ]; break;
-
+        case FbnListType_SearchObject: struct FbnSearchObject Entry[ EntryCount ]; break;
+        case FbnListType_SearchObjectHit: struct FbnTriggerVolume Entry[ EntryCount ]; break;
+        case 21: struct FbnBlock21Entry Entry[ EntryCount ]; break; //Security Objects i think?????
+        case FbnListType_VoiceHit: struct FbnTriggerVolume Entry[ EntryCount ]; break;
+        case FbnListType_GrappleObject: struct FbnGrappleObject Entry[ EntryCount ]; break;
+        case FbnListType_GrappleTrigger: struct FbnGrappleTrigger Entry[ EntryCount ]; break;
         default:
             Printf( "[FbnList] Unhandled block entry type: %d\n", type );
             break;
@@ -194,7 +186,7 @@ typedef struct
     f32 Field14;
     f32 Field18;
     f32 Field1C;
-    f32 Field20;
+    f32 Scale;
     f32 Field24; // was 0, might be s32
     f32 Field28; // was 0, might be s32
     Vector3 BottomRight;
@@ -221,25 +213,45 @@ typedef struct
 
 } FbnEntrance <optimize=false>;
 
-typedef struct
+enum<short> PromptTypeList
 {
-    s16 TitleTextId : 8;
-    s16 SubTitleTextId : 8;
-} FbnHitDefinitionTextIds;
+    EXAMINE_fldCheckName0 = 0,
+    GO_Blank = 1,
+    EXAMINE_fldCheckName1 = 2,
+    EXAMINE_fldCheckName2 = 3,
+    EXAMINE_fldCheckName3 = 4,    
+    EXAMINE_fldCheckName4 = 5,
+    STEAL_fldCheckName = 6,
+    ACTION_fldActionName0 = 7,
+    ACTION_fldActionName1 = 8,
+    ACTION_fldActionName2 = 9,
+    TALK_fldNPCName = 10,
+    GO_fldPlaceName = 11,
+    SHOP_fldCheckName = 12,
+    EXAMINE_fldKFECheckName = 13,    
+};
 
-// Defines the hit/interaction info for a trigger volume
-// Each hit definition corresponds to an FBN trigger
 typedef struct
 {
-    LittleEndian();
-    s32 BitFlags[6] <comment="If bit flag is set, then hit is disabled">;
-    s8 Field18;
-    s8 PromptType <comment="Display prompt type (GO, Examine, Action, auto)">;
-    s16 TextId <comment="FTD text ID to display">;
-    s16 ProcedureId;
-    BigEndian();
-    s8 PromptSubType <comment="Used to display prompts like Shop">;
-    s8 Unused[29];
+    int TrueFlag<name="Enabling Bitflag ">; //Adachi True!
+    int TrueFlag<name="Enabling Bitflag ">;
+    int TrueFlag<name="Enabling Bitflag ">;
+    int FalseFlag<name="Disabling Bitflag ">;
+    int FalseFlag<name="Disabling Bitflag ">;
+    int FalseFlag<name="Disabling Bitflag ">;
+} Bitflags;
+
+typedef struct
+{
+    Bitflags bitflags<name="Entry Flags">; 
+    SetBackColor( 0xffffffff );
+    u8 PaddingByte;
+    u8 HitType;
+    u16 NameID;
+    u16 ProcedureIndex;
+    PromptTypeList PromptType<name="Prompt Table">;
+    u32 UnusedValues[7];
+    
 } FbnHitDefinition <optimize=false>;
 
 typedef struct
@@ -257,16 +269,15 @@ typedef struct
 typedef struct
 {
     SetRandomBackColor();
-    
     s32 Field00;
     Vector3 Position;
-    f32 Field10[4]; // box coordinates maybe?
-    s16 Field20;
-    s16 Field22;
-    s16 Field24;
+    Quaternion Rotation;
+    s16 Model_MajorID;
+    s16 Model_MinorID;
+    u16 Chest_ResourceHandle;
     s16 Field26;
 
-} FbnBlock9Entry <optimize=false>;
+} FbnTreasureChest <optimize=false>;
 
 typedef struct
 {
@@ -274,7 +285,8 @@ typedef struct
 
     s32 Field00;
     s32 Field04;
-    f32 Field08[24];
+    f32 Point1[12];
+    f32 Point2[12];
     s32 Field68;
     s32 Field6C;
     s32 Field70;
@@ -283,39 +295,41 @@ typedef struct
     s16 Field7A;
     f32 Field7C[6];
 
-} FbnBlock10Entry <optimize=false>;
+} FbnCoverPoints <optimize=false>;
 
 typedef struct
 {
     SetRandomBackColor();
 
-    s32 Field00;
-    f32 Field04;    
+    s32 Padding;
+    f32 ShadowSpeed;    
     s32 Field08;
-    s32 Field0C;
+    s32 DoesShadowExist;
     s32 Field10;
     s32 Field14;
-    s16 EntryCount;
-    s16 Field1A;
-    struct FbnBlock11SubEntry Entries[ EntryCount ];    
+    s16 PathNodeCount;
+    s16 Paddington;
+    struct ShadowPath PathNode[ PathNodeCount ];    
 
-} FbnBlock11Entry <optimize=false>;
+} FbnShadow <optimize=false>;
 
 typedef struct
 {    
-    IntFloat Field00;
-    IntFloat Field04;
-    IntFloat Field08;
-    IntFloat Field0C;
-} FbnBlock11SubEntry;
+    IntFloat XTarget;
+    IntFloat YTarget;
+    IntFloat ZTarget;
+    IntFloat IdleTime;
+} ShadowPath;
 
 typedef struct
 {
     SetRandomBackColor();
 
 	s32 Field00;        // always 1?
-	Vector3 Field04;     // 3F 80 00 00 BF 7F FF FF 00 00 00 00
-	Vector3 Field10;     // B2 59 FA A4 00 00 00 00 00 00 00 00
+	f32 Field04;
+	Vector3 NPCRotation<comment="Last column of complex rotation matrix">; 
+	f32 Field14;
+	f32 Field18;
 	s16 Id;        // 0x6E, 0x2BE, 0x2BF, 0x2C0, 0x2C1, maybe object type?
 	s16 Field1E;        // always 0?
 	s32 Field20;        // always 1?
@@ -323,7 +337,7 @@ typedef struct
 	s32 Field28;        // 0xFFFFFFFF, 0
 	s16 PathNodeCount;  
 	s16 Field2E;        // always 0?
-	Vector3 PathNodes[ PathNodeCount ]; 
+	Vector3 PathNodes[ PathNodeCount ]<comment="1st Path Node is used as the NPC's position">; 
 } FbnNpc <optimize=false>;
 
 typedef struct
@@ -335,12 +349,11 @@ typedef struct
     s16 Field06;
     Vector3 Position;
     Quaternion Rotation;
-    s16 Field24;
-    s16 Field26;
-    s16 Field28;
+    s16 Model_MajorID;
+    s16 Model_MinorID;
+    u16 SearchObject_ResourceHandle;
     s16 Field2A;
-
-} FbnBlock18Entry <optimize=false>;
+} FbnSearchObject <optimize=false>;
 
 typedef struct
 {
@@ -351,14 +364,53 @@ typedef struct
     Quaternion Rotation;
     s16 Field20;
     s16 Field22;
-    s16 Field24;
-    s16 Field26;
-    s16 Field28;
+    s16 Model_MajorID;
+    s16 Model_MinorID;
+    u16 Gimmick_ResourceHandle;
     s16 Field2A;
     s32 Field2C;
     f32 Field30;
     f32 Field34;
 } FbnBlock21Entry <optimize=false>;
+
+typedef struct
+{
+    SetRandomBackColor();
+
+    u32 unk0;
+    u16 unk1;
+    s16 Wire_SequenceID;
+    Vector3 Position;
+    Quaternion Rotation;
+    s16 Model_MajorID;
+    s16 Model_MinorID;
+    u16 Grapple_ResourceHandle;
+    u16 Dummy[3];
+} FbnGrappleObject <optimize=false>;
+
+typedef struct
+{
+    SetRandomBackColor();
+
+    u32 Field00;
+    s16 Field02;
+    s16 Field04;
+    u16 Grapple_ResourceHandle;
+    s16 Field06;
+    Vector3 Center;
+    f32 Field14;
+    f32 Field18;
+    f32 Field1C;
+    f32 Scale;
+    f32 Field24;
+    f32 Field28;
+    Vector3 BottomRight;
+    Vector3 TopRight;
+    Vector3 BottomLeft;
+    Vector3 TopLeft;
+    u16 Field5C;
+    u16 Field60;
+} FbnGrappleTrigger <optimize=false>;
 
 BigEndian();
 while ( !FEof() )

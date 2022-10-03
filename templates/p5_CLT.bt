@@ -251,7 +251,7 @@ typedef struct( int Version )
 string TypeRead( Entry1& block )
 {
     char buffer[32];
-    SPrintf( buffer, "Num %02d", block.Block_Type );
+    SPrintf( buffer, "Num %02d", Unk_Cnd1 );
     return buffer;
 }
 

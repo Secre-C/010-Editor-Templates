@@ -5,12 +5,13 @@
 //   Authors: 
 //   Version: 
 //   Purpose: 
-//  Category: 
+//  Category: Persona 5
 // File Mask: 
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 #include "common/include.h"
+#include "common/p5.h"
 
 local int index = -1;
 
@@ -63,6 +64,7 @@ enum<u32> MinimapIcon
 	Gray_Arrow_Down_Right = 39,
 	Palace_Ruler_Treasure = 40,
 	Yellow_Check_Mark = 43,
+    Will_Seed = 97,
 };
 typedef struct
 {
@@ -115,7 +117,7 @@ typedef struct
     }
 	s32 LayerCount;
 	f32 Field3c;
-	s32 a_Flag_Thing;
+	Bitflag a_Flag_Thing;
 	f32 Field00;
 	f32 Field04;
 	f32 Field08;
@@ -124,7 +126,7 @@ typedef struct
 	f32 Field14;
 	f32 Field18;
 	f32 Field1c;
-	s32 Field20<name = "A flag that uhhh">;
+	Bitflag Field20<name = "A flag that uhhh">;
 	s16 Name;
     s16 Field26;
 	s16 Field28;
@@ -195,7 +197,7 @@ typedef struct
 	f32 Field14 <name = "Map X Offset from Left">;
 	f32 Field18 <name = "Map Y Offset from Bottom">;
 	}
-	s32 Field1C <name = "Bitflag Requirement">;
+	Bitflag Field1C <name = "Bitflag Requirement">;
 	s32 Field20;
 	f32 Field24;
 	f32 Field28;
