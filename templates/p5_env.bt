@@ -305,8 +305,8 @@ typedef struct
     f32 Field24D<name = "Red/Blue Levels">;
     f32 Field251<name = "Green/Pink Levels">;
     f32 Field255<name = "Blue/Yellow Levels">;
-    f32 Field259<name = "Brightness Control">;
-    f32 Field25D<name = "Contrast Control">;
+    f32 Field259<name = "Dodge Levels">;
+    f32 Field25D<name = "Burn Levels">;
 } ColorParams;
 
 typedef struct
