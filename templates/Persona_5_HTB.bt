@@ -52,6 +52,12 @@ enum<short> PromptTypeList
     EXAMINE_fldKFECheckName = 13,    
 };
 
+enum<byte> TriggerTypeList
+{
+	Autohit = 0,
+	Hit		= 2,
+};
+
 typedef struct
 {   
     LittleEndian();
@@ -64,7 +70,7 @@ typedef struct
 
     SetBackColor( 0xffffffff );
     byte PaddingByte<hidden=true>;
-    byte HitType<name="Trigger Type">;
+    TriggerTypeList HitType<name="Trigger Type">;
     SetBackColor( 0x00ff00ff );
     short NameID<name="Text ID">;
 

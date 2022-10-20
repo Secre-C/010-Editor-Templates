@@ -111,7 +111,8 @@ typedef struct
     local s32 startOffset = FTell();
 
 	FbnListType Type;   // 'FBN0', 4, 1
-	s32 Version;       
+	local string TypeEnumString = EnumToString(Type);
+    s32 Version;       
 	s32 Size;           // Size of the block including this header
 	s32 ListOffset;     // Always 0x10 if not main header block
 
@@ -135,8 +136,13 @@ typedef struct
 
 string FbnBlockRead( FbnBlock& block )
 {
+	if ( block.Type == 1178750512 )
+    {
+        block.TypeEnumString = "Header";
+        block.Type = 0;
+    }
     char buffer[32];
-    SPrintf( buffer, "Type %02d, Version 0x%08X", block.Type, block.Version );
+    SPrintf( buffer, "%s (Type %02d), Version 0x%08X", block.TypeEnumString, block.Type, block.Version );
     return buffer;
 }
 
