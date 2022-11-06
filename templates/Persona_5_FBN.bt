@@ -139,7 +139,7 @@ string FbnBlockRead( FbnBlock& block )
 	if ( block.Type == 1178750512 )
     {
         block.TypeEnumString = "Header";
-        block.Type = 0;
+        //block.Type = 0;
     }
     char buffer[32];
     SPrintf( buffer, "%s (Type %02d), Version 0x%08X", block.TypeEnumString, block.Type, block.Version );
@@ -384,14 +384,17 @@ typedef struct
     SetRandomBackColor();
 
     u32 unk0;
-    u16 unk1;
+	bool JumpAfterGrapple; //dunno if it's actually bool. 0 - falling, 1 - jumping, 2 - Joker just stays in place
+	bool JumpAfterGrapple2; //both of these seem to do the same thing
     s16 Wire_SequenceID;
     Vector3 Position;
     Quaternion Rotation;
     s16 Model_MajorID;
     s16 Model_MinorID;
     u16 Grapple_ResourceHandle;
-    u16 Dummy[3];
+	u16 unk1;
+	u16 JumpLength; //direction is calculated based on object rotation
+	u16 JumpHeight; //seems to have a maximum
 } FbnGrappleObject <optimize=false>;
 
 typedef struct
