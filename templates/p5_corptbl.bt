@@ -92,6 +92,7 @@ typedef struct
 	LittleEndian();
     TimeOfDay Field7A;
 	u8 TimeofDayOverride;
+	u32 P5RNew<hidden=true>;
 	f32 Field7C;
 	f32 Field80;
 	f32 Field84;
@@ -106,6 +107,7 @@ typedef struct
 	Bitflag ExtraBitFlag1;
     Bitflag ExtraBitFlag2;
 	s32 MainProcedureID;
+	u32 P5RNew_2;
 	BigEndian();
 }table <read=table_read, name = "Corp Table Entry">;
 

@@ -308,6 +308,7 @@ typedef struct( u32 entrySize, string fileName )
 			
 		case "cmmFormat":
 			cmmFormat Data;
+            break;
 			
 		case "fldWireAnimData":
 			fldWireAnimDataTable Data;

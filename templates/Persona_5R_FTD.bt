@@ -254,6 +254,19 @@ typedef struct
 	u16 field6e;
 }fldWireAnimDataTable <name = "Dramatic Grappling Hook Sequence Parameters">;
 
+typedef struct
+{
+	local string s;
+	u16 ShopBannerID;
+	bool HideNameTag;
+	enum<u8>{
+		BannerYenEnableback = 0,
+		SharedPointsEnableback = 1,
+		SharedCasinoEnableback = 2,
+		SharedYenEnableback = 3,
+		SharedYenDisableback = 4
+	}shopMode;
+}fclPublicShopDataFtd<read=(SPrintf(s, "Banner -> %02d; DisableNametag -> %s", ShopBannerID, HideNameTag? "true":"false"))>;
 
 string fldLmapStationTableRead( fldLmapStation &o )
 {
@@ -455,6 +468,10 @@ typedef struct( u32 entrySize, string fileName )
             case "FLDSYMMODELNO":
                 u16 ShadowOffset;
                 break;
+				
+			case "fclPublicShopDataTable":
+				fclPublicShopDataFtd data;
+				break;
 				
         default:
             u8 Data[ entrySize ];

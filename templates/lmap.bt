@@ -87,18 +87,29 @@ typedef struct
 			short FieldMinorId;
 			isNegative1 = (FieldMajorId == -1 && FieldMinorId == -1);
 		}FieldIds<read=(SPrintf(s, "Field -> F%03d_%03d", FieldMajorId, FieldMinorId))>;
+		place = place + 1;
 	}
-	place = place + 1;
 	isNegative1 = 0;
 }lmapCmmFieldIds;
 
 typedef struct
 {
-	while (place < 36)
+	local int i;
+	while (i < 36)
+	{
+		lmapCmmFieldIds data;
+		i++;
+	}
+}lmapCmmFields;
+
+
+typedef struct
+{
+	while (place < FileSize() / 4)
 	{
 		lmapCmmFieldIds data;
 	}
-}lmapCmmFields;
+}lmapImageTable;
 
 local int64 fileSize = FileSize();
 local string filePath = GetFileName();
@@ -120,6 +131,10 @@ typedef struct( string fileName, int64 fileSize )
 				lmapCmmFields data;
 				break;
 				
+			case "map_l_table":
+			lmapImageTable data;
+			break;
+			
 			default:
 			byte Field00[fileSize];
 			break;
