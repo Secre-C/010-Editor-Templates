@@ -11,7 +11,6 @@
 //   History: 
 //------------------------------------------------
 #include "common/include.h"
-#include "common/p5.h"
 
 enum<short> weather
 {
@@ -78,7 +77,8 @@ typedef struct
 	u16 Field04;
 	u16 Field06;
 	u32 Field08;
-	Bitflag Field0C[22] <name = "Bitflags">;
+	Bitflag EnablingBitflags[11] <name = "Enabling Bitflags">;
+	Bitflag DisablingBitflags[11] <name = "Disabling Bitflags">;
 	u16 Field_MajorId <name = "Field Major Id">;
 	u8 Field_MinorId <name = "Field Minor Id">;
 	u8 Field_SubId <name = "Field Sub Id">;

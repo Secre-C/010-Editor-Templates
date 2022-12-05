@@ -151,19 +151,20 @@ typedef struct
 
 typedef struct
 {
+    LittleEndian();
     CherryRandomColor();
-	struct
-	{
-		Bitflag TrueFlag<name = "Enabling Bitflag ">; //Adachi True!
-		Bitflag TrueFlag<name = "Enabling Bitflag ">;
-		Bitflag TrueFlag<name = "Enabling Bitflag ">;
-		Bitflag FalseFlag<name = "Disabling Bitflag ">;
-		Bitflag FalseFlag<name = "Disabling Bitflag ">;
-		Bitflag FalseFlag<name = "Disabling Bitflag ">;
-	} Bitflags <name = "Entry Bitflags">;
+    struct
+    {
+        Bitflag TrueFlag<name = "Enabling Bitflag ">; //Adachi True!
+        Bitflag TrueFlag<name = "Enabling Bitflag ">;
+        Bitflag TrueFlag<name = "Enabling Bitflag ">;
+        Bitflag FalseFlag<name = "Disabling Bitflag ">;
+        Bitflag FalseFlag<name = "Disabling Bitflag ">;
+        Bitflag FalseFlag<name = "Disabling Bitflag ">;
+    } Bitflags <name = "Entry Bitflags">;
     CherryRandomColor();
     u8 PaddingByte;
-    u8 HitType;
+    enum <u8> { Autohit = 0, Hit = 2 } HitType;
     u16 NameID;
     u16 ProcedureIndex;
     enum<short>
@@ -184,7 +185,7 @@ typedef struct
         EXAMINE_fldKFECheckName = 13,
     } PromptTypeList;
     u32 UnusedValues[7];
-} FbnHitDefinition <optimize = false>;
+} FbnHitDefinition <optimize = false, read = ( Str( "Hit BF Index :  %05i   ||   Type :  %s   ||   String :  %s  [ #%i ]", ProcedureIndex, EnumToString( HitType ), EnumToString( PromptTypeList ), NameID ) )>;
 
 typedef struct
 {

@@ -7,7 +7,6 @@
 // Includes
 //---------------------------------------------
 #include "common/include.h"
-#include "common/p5.h"
 #include "Persona_5R_ENUMS_FTD.bt"
 #include "Persona_5_ENUMS_ITEM.bt"
 
@@ -380,6 +379,7 @@ typedef struct( u32 entrySize, string fileName )
 			u16 DoorObjMinorId;
 			s32 DungeonAcbCueId;
 			s32 unk0;
+            break;
 			
 		case "FLDWIREANIMDATA":
 			u16 SequenceId <name = "Wire Sequence ID">;

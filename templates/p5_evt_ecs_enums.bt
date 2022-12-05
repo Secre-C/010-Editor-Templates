@@ -1,13 +1,20 @@
 enum<int> ObjectType
 {
-    ObjectType_Field       = 0x00000003, // ps3/field/f{MajorId:3}_{MinorId:3}.pac
-    ObjectType_ParticlePak = 0x00000007, // data\effect\event\ee{MajorId:3}_{MinorId:3}.pak
-    ObjectType_Camera      = 0x00000009, // data\evtcmr\ecm{MajorId:3}_{MinorId:3}_{SubId:3}.bin
-    ObjectType_Prop        = 0x00000601,
-    ObjectType_Particle    = 0x01000002, // data\effect\event\ee{MajorId:3}_{MinorId:3}.EPL
-    ObjectType_Character   = 0x01000101, // data\model\character\{MajorId:4}\c{MajorId:4}_{MinorId:3}_{SubId:2}.GMD
-    ObjectType_Enemy       = 0x00000301, // Loads a unit from data/battle/table.pac/table/UNIT.TBL, the table determining which model from data/model/character/enemy
-    ObjectType_Environment = 0x00000004  // data/env/env{MajorId:3}_{MinorId:3}_{SubId:3}.ENV
+    ObjectType_Field       	= 0x00000003,				// ps3/field/f{MajorId:3}_{MinorId:3}.pac
+    ObjectType_ParticlePak 	= 0x00000007,               // data\effect\event\ee{MajorId:3}_{MinorId:3}.pak
+    ObjectType_Camera      	= 0x00000009,               // data\evtcmr\ecm{MajorId:3}_{MinorId:3}_{SubId:3}.bin
+    ObjectType_SymShadow      	= 0x00000401,           
+    ObjectType_Item        	= 0x00000601,               
+    ObjectType_ResrcTableNpc   = 0x00020101,            
+    ObjectType_Particle    	= 0x01000002,               // data\effect\event\ee{MajorId:3}_{MinorId:3}.EPL
+    ObjectType_Character   	= 0x01000101,               // data\model\character\{MajorId:4}\c{MajorId:4}_{MinorId:3}_{SubId:2}.GMD
+    ObjectType_FieldCharacter  = 0x02000101,
+    ObjectType_Persona   		= 0x04000201,			
+    ObjectType_Enemy       	= 0x00000301,				// Loads a unit from data/battle/table.pac/table/UNIT.TBL, the table determining which model from data/model/character/enemy
+    ObjectType_FieldObject 	= 0x02000701,
+    ObjectType_Image       	= 0x00000005,
+    ObjectType_Env    			= 0x00000004,			// data/env/env{MajorId:3}_{MinorId:3}_{SubId:3}.ENV
+    ObjectType_Movie       	= 0x00000008
 };
 
 enum<int> FadeType
