@@ -1302,13 +1302,26 @@ typedef struct
 
 typedef struct
 {
-	struct
+	if (IsBigEndian())
 	{
-		u32 dummy : 29<hidden=true>;
-		u32 PuddleEffect : 1;
-		u32 AreaDistortion : 1;
-		u32 dummyBitMaybe : 1;
-	}FootstepDistortionBitfield;
+		struct
+		{
+			u32 dummy : 29<hidden=true>;
+			u32 PuddleEffect : 1;
+			u32 AreaDistortion : 1;
+			u32 dummyBitMaybe : 1;
+		}FootstepDistortionBitfield;
+	}
+	else
+	{
+		struct
+		{
+			u32 dummyBitMaybe : 1;
+			u32 AreaDistortion : 1;
+			u32 PuddleEffect : 1;
+			u32 dummy : 29<hidden=true>;
+		}FootstepDistortionBitfield;	
+	}
 	
     f32 FootstepDistortionStrength;
     u32 Field08;
