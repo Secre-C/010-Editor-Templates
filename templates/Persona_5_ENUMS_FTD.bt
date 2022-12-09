@@ -13,6 +13,19 @@ enum<short> travelType
 	Open_Map = 32,
 };
 
+enum<u16> ItemType
+{
+	Melee_Weapons = 0,
+	Armor = 1,
+	Accessories = 2,
+	Consumables = 3,
+	Key_Items = 4,
+	Materials = 5,
+	Skill_Cards = 6,
+	Outfits = 7,
+	Ranged_Weapons = 8,
+};
+
 enum<short> ConfidantFunction_Type
 {
     Battle_ConfidantFunction = 0,

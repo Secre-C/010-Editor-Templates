@@ -51,27 +51,13 @@ typedef struct
 	ubyte MainSpd2Unused;
 	ubyte KanjiSpdId;
 	ubyte LableSpdId;
-}lmapParams<read=lmapParamRead>;
-
-string lmapParamRead( lmapParams &o )
-{
-	local string s;
-	SPrintf(s, "SPD IDs: Main -> %03d; Kanji -> %03d; Label -> %03d", o.MainSpdId, o.KanjiSpdId, o.LableSpdId);	
-	return s;
-}
+}lmapParams<read=Str("SPD IDs: Main -> %03d; Kanji -> %03d; Label -> %03d", MainSpdId, KanjiSpdId, LableSpdId)>;
 
 typedef struct
 {
 	int CorpTblIndex;
 	int FlagMaybe<format=hex>;
-}lmapCmmIds<read=lmapCmmIdsRead>;
-
-string lmapCmmIdsRead( lmapCmmIds &o )
-{
-	local string s;
-	SPrintf(s, "Corptbl Index -> %02d; flag? -> %05x", o.CorpTblIndex, o.FlagMaybe);	
-	return s;
-}
+}lmapCmmIds<read=Str("Corptbl Index -> %02d; flag? -> %05x", CorpTblIndex, FlagMaybe)>;
 
 local int place = 0;
 
@@ -102,7 +88,6 @@ typedef struct
 	}
 }lmapCmmFields;
 
-
 typedef struct
 {
 	while (place < FileSize() / 4)
@@ -110,6 +95,51 @@ typedef struct
 		lmapCmmFieldIds data;
 	}
 }lmapImageTable;
+
+typedef struct
+{
+	char name[0x20];
+}lmapImageName<read=name>;
+
+typedef struct
+{
+	local string s;
+	short Original_ArcanaId;
+	short New_ArcanaId;
+}cmmFriend<read=(SPrintf(s, "%02d -> %02d", Original_ArcanaId, New_ArcanaId)), optimize=false>;
+
+typedef struct
+{
+	short paramIndex<name="Icon Param Index">;
+	char Chat_Name_Tag[0x1e];
+    char padding[0x10]<hidden=true>;
+	
+	local string s;
+	if (paramIndex == -1)
+	{
+		SPrintf(s, "Name File End");
+	}
+	else
+	{
+		SPrintf(s, "Param Index -> %03d; Name Tag -> %s", paramIndex, Chat_Name_Tag);	
+	}
+	
+}nameIds<read=s>;
+
+typedef struct
+{
+	short unk0;
+	short chatSPD_ID;
+	float IconXOffset;
+	float IconYOffset;
+	float IconScale;
+	float IconRotation;
+	float PreviewIconXOffset;
+	float PreviewIconYOffset;
+	float PreviewIconScale;
+	float PreviewIconRotate;
+	int unk2[4];
+}iconParams<read=Str("Spd ID -> %03d", chatSPD_ID)>;
 
 local int64 fileSize = FileSize();
 local string filePath = GetFileName();
@@ -134,7 +164,31 @@ typedef struct( string fileName, int64 fileSize )
 			case "map_l_table":
 			lmapImageTable data;
 			break;
+				
+			case "map_l_names":
+			lmapImageName data [fileSize / 0x20];
+			break;
 			
+			case "ChatBgColors":
+				uint chatColor[FileSize() / 4]<format=hex>;
+				break;
+			
+			case "ChatNameIds_En":
+			case "ChatNameIds_Fr":
+			case "ChatNameIds_It":
+			case "ChatNameIds_De":
+			case "ChatNameIds_Es":
+				nameIds data[FileSize() / 48]<optimize=false>;
+				break;
+			
+			case "ChatIconParams":
+				iconParams data[FileSize() / 52]<optimize=false>;
+				break;
+			
+			case "cmmFriendTable":
+				cmmFriend data[fileSize / 4];
+				break;
+				
 			default:
 			byte Field00[fileSize];
 			break;

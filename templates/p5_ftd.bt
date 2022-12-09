@@ -15,7 +15,6 @@
 // Includes
 //---------------------------------------------
 #include "common/include.h"
-#include "common/p5.h"
 #include "p5_enums_ftd.bt"
 
 // Define structures

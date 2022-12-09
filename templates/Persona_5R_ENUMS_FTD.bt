@@ -4,6 +4,19 @@ enum<u16> FtdListType
     FtdListType_EmbeddedFtd,
 };
 
+enum<u16> ItemType
+{
+	Melee_Weapons = 0,
+	Armor = 1,
+	Accessories = 2,
+	Consumables = 3,
+	Key_Items = 4,
+	Materials = 5,
+	Skill_Cards = 6,
+	Outfits = 7,
+	Ranged_Weapons = 8,
+};
+
 enum<short> travelType
 {
 	Go_To_Field = 27,
