@@ -201,60 +201,6 @@ typedef struct
 
 typedef struct
 {
-	u16 SequenceId <name = "Wire Sequence ID">;
-	u16 AnimationID <name = "Joker Field Animation Minor ID">;
-	u16 field04;
-	u16 field06;
-	u16 field08;
-	u16 field0a;
-	u16 field0c;
-	u16 CueID <name = "Wire Sound Effect Cue ID">;
-	u16 field10;
-	u16 field12;
-	u16 field14;
-	u16 field16;
-	u16 field18;
-	u16 field1a;
-	u16 field1c;
-	u16 field1e;
-	u16 CameraMajor <name = "Field Camera Major ID">;
-	u16 CameraMinor <name = "Field Camera Minor ID">;
-	u16 field24;
-	u16 WireAnimID <name = "Grappling Hook (it6400_001.GMD) Animation ID">;
-	u16 FieldMajor <name = "Field Major ID">;
-	u16 FieldMinor <name = "Field Minor ID">;;
-	u16 field2c;
-	u16 field2e;
-	s32 xStartOffset <name = "X Position Start Offset">;
-	s32 yStartOffset <name = "Y Position Start Offset">;
-	s32 xStartOffset <name = "Z Position Start Offset">;
-	s32 xEndOffset <name = "X Position End Offset">;
-	s32 yEndOffset <name = "Y Position End Offset">;
-	s32 xEndOffset <name = "Z Position End Offset">;
-	u16 field48;
-	u16 field4a;
-	u16 field4c;
-	u16 field4e;
-	u16 field50;
-	u16 field52;
-	u16 field54;
-	u16 field56;
-	u16 field58;
-	u16 field5a;
-	u16 field5c;
-	u16 field5e;
-	u16 field60;
-	u16 field62;
-	u16 field64;
-	u16 field66;
-	u16 field68;
-	u16 field6a;
-	u16 field6c;
-	u16 field6e;
-}fldWireAnimDataTable <name = "Dramatic Grappling Hook Sequence Parameters">;
-
-typedef struct
-{
 	local string s;
 	u16 ShopBannerID;
 	bool HideNameTag;
@@ -281,19 +227,13 @@ string mapTableRead( fldMapEntry &o )
 	return s;
 }
 
-string fldWireAnimDataTableRead( fldWireAnimDataTable &o )
-{
-	local string s;
-	SPrintf( s, "ID %d: Field %03d_%03d", o.SequenceId, FieldMajor, FieldMinor );
-	return s;
-}
-
 typedef struct( u32 entrySize, string fileName )
 {
     SetRandomBackColor();
 
     switch ( fileName )
     {
+        case "datEncountPack":
         case "DATENCOUNTPACK":
             u8 field_0;
             u8 UnusedSlot[ 7 ];
@@ -310,10 +250,12 @@ typedef struct( u32 entrySize, string fileName )
             //Printf("Field0: %Lx\n", field_0);
             break;
 
+        case "fldObjFlag":
         case "FLDOBJFLAG":
             fldObj Objects[10];
             break;
 
+        case "datTBoxRnd":
         case "DATTBOXRND":
               struct
               {
@@ -326,6 +268,7 @@ typedef struct( u32 entrySize, string fileName )
               } SearchItem[ 4 ] <optimize=false>;
             break;
 
+        case "datTBox":
         case "DATTBOX":
             //u16 Item;
             ItemIndex ItemEntry <name = "Item">;
@@ -333,6 +276,7 @@ typedef struct( u32 entrySize, string fileName )
             u8 Padding<hidden=true>;
             break;
 
+        case "fldDngPack":
         case "FLDDNGPACK":
             u16 EncountPackEntry;
             u16 ObjFlagEntry;
@@ -340,6 +284,7 @@ typedef struct( u32 entrySize, string fileName )
             u8 Unknown2[10];
             break;
 
+        case "fldPlayerSpeed":
         case "FLDPLAYERSPEED":
             short FieldMajor;
             short FieldMinor;
@@ -351,13 +296,21 @@ typedef struct( u32 entrySize, string fileName )
             u8 Padding;
             break;
 			
+		case "fldWholeMapTable":
+		case "fldWholeMapTableDng":
 		case "FLDWHOLEMAPTABLE":
 		case "FLDWHOLEMAPTABLEDNG":
 			fldMapTable Data;
             break;
 			
+		case "fldLmapStation":
 		case "FLDLMAPSTATION":
 			fldLmapStation Data;
+			break;
+			
+		case "fldLmapFare":
+		case "FLDLMAPFARE":
+			s32 travelCost[36]<name="Travel cost to Lmap Destination">;
 			break;
 			
 		case "cmmFormat":
@@ -435,12 +388,20 @@ typedef struct( u32 entrySize, string fileName )
             break;
 			
 		case "FLDDOORANIM":
+		case "fldDoorAnim":
 			u16 DoorObjMajorId;
 			u16 DoorObjMinorId;
 			u16 FldAnimGapId;
-			u16 unk0[7];
+			s16 playerXOffset;
+			s16 playerYOffset;
+			s16 playerZOffset;
+			s16 playerXOffset2;
+			s16 playerYOffset2;
+			s16 playerZOffset2;
+			s16 unk0;
 			break;
 			
+		case "fldDoorSE":
 		case "FLDDOORSE":
 			u16 DoorObjMajorId;
 			u16 DoorObjMinorId;
@@ -448,13 +409,14 @@ typedef struct( u32 entrySize, string fileName )
 			s32 unk0;
             break;
 			
+		case "fldWireAnimData":
 		case "FLDWIREANIMDATA":
 			u16 SequenceId <name = "Wire Sequence ID">;
 			u16 AnimationID <name = "Joker Field Animation Minor ID">;
-			u16 field04;
-			u16 field06;
-			u16 field08;
-			u16 field0a;
+			u16 WireLaunchSndDelay;
+			u16 WireHitEffectDelay;
+			u16 WireWhooshEffectDelay;
+			u16 WireWhooshSoundDelay;
 			u16 field0c;
 			u16 CueID <name = "Wire Sound Effect Cue ID">;
 			u16 field10;

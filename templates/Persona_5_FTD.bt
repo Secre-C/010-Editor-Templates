@@ -341,6 +341,10 @@ typedef struct( u32 entrySize, string fileName )
 			fldLmapStation Data;
 			break;
 			
+		case "fldLmapFare":
+			s32 travelCost[36]<name="Travel cost to Lmap Destination">;
+			break;
+			
 		case "cmmFormat":
 			cmmFormat Data;
             break;
@@ -416,7 +420,7 @@ typedef struct( u32 entrySize, string fileName )
 				ushort Unknown;
 				ItemizationType Type : 4 <name = "Required Item Type">;
 				ushort Item : 12 <name = "Required Item">;
-			} Table_fclCombElectItem <name = "Persona Itemization">;
+			} TablefclCombElectItem <name = "Persona Itemization">;
             break;
 			
 		case "fldWireAnimData":

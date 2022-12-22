@@ -193,7 +193,7 @@ typedef struct
 
     if ( Type == ObjectType_Enemy ) // If the Object type is an Enemy...  
     {
-        u32 ResourceMajorId<name="Unit Table Index">;         // ...This field uses the unit ID in UNIT.TBL (which chooses which model to load)
+        u32 UnitTableIndex;         // ...This field uses the unit ID in UNIT.TBL (which chooses which model to load)
     }    
     else 
     {
@@ -235,7 +235,8 @@ typedef struct
         Count = 4
 	}FlagType;
 	
-    Bitflag FlagId; //flag ID, Count ID, or Evt Local Data ID
+    //Bitflag FlagId; //flag ID, Count ID, or Evt Local Data ID
+    u32 FlagId;
 	u32 FlagValue; //Value result stored in flagID
 	
     enum<u32>{
@@ -261,8 +262,12 @@ typedef struct
         case FourCC( "CAA_" ): struct CommandData_CAA Data; break;
         case FourCC( "CAR_" ): struct CommandData_CAR Data; break;
         case FourCC( "CClp" ): struct CommandData_CClp Data; break;
+        case FourCC( "CCS_" ): struct CommandData_CCS Data; break; // 0x140e17710
         case FourCC( "Chap" ): struct CommandData_Chap Data; break;
         case FourCC( "Cht_" ): struct CommandData_Cht Data; break;
+        case FourCC( "CiSt" ): struct CommandData_CiSt Data; break; // 0x140e19290
+        // CMA_
+        case FourCC( "CMC_" ): struct CommandData_CMC Data; break; // 0x140e2d0a0
         case FourCC( "CMCn" ): struct CommandData_CMCn Data; break;
         case FourCC( "CMD_" ): struct CommandData_CMD Data; break;
         case FourCC( "CQuk" ): struct CommandData_CQuk Data; break;
@@ -270,7 +275,9 @@ typedef struct
         case FourCC( "CSD_" ): struct CommandData_CSD Data; break;
         case FourCC( "CSEc" ): struct CommandData_CSEc Data; break;
         case FourCC( "CShk" ): struct CommandData_CShk Data; break;
+        // CSK_
         case FourCC( "CwCl" ): struct CommandData_CwCl Data; break;
+        case FourCC( "CwD_" ): struct CommandData_CwD Data; break; // 0x140e12d10
         case FourCC( "CwHt" ): struct CommandData_CwHt Data; break;
         case FourCC( "CwP_" ): struct CommandData_CwP Data; break;
         case FourCC( "Date" ): struct CommandData_Date Data; break;
@@ -288,11 +295,13 @@ typedef struct
         case FourCC( "EnOl" ): struct CommandData_EnOl Data; break;
         case FourCC( "EnPh" ): struct CommandData_EnPh Data; break;
         case FourCC( "EnSh" ): struct CommandData_EnSh Data; break;
+        // EnSs
         case FourCC( "Env_" ): struct CommandData_Env Data; break;
         case FourCC( "ERgs" ): struct CommandData_ERgs Data; break;
         case FourCC( "EScl" ): struct CommandData_EScl Data; break;
         case FourCC( "ESD_" ): struct CommandData_ESD Data; break;
         case FourCC( "ESH_" ): struct CommandData_ESH Data; break;
+        case FourCC( "ESN_" ): struct CommandData_ESN Data; break; // 0x140e58250
         case FourCC( "FAA_" ): struct CommandData_FAA Data; break;
         case FourCC( "FAB_" ): struct CommandData_FAB Data; break;
         case FourCC( "FbEn" ): struct CommandData_FbEn Data; break;
@@ -301,17 +310,24 @@ typedef struct
         case FourCC( "FdS_" ): struct CommandData_FdS Data; break;
         case FourCC( "FGFl" ): struct CommandData_FGFl Data; break;
         case FourCC( "Flbk" ): struct CommandData_Flbk Data; break;
+        case FourCC( "FMtn" ): struct CommandData_FMtn Data; break; // 0x140e1e670
+        case FourCC( "FOA_" ): struct CommandData_FOA Data; break; // 0x140e35a00
         case FourCC( "FOD_" ): struct CommandData_FOD Data; break;
         case FourCC( "FrJ_" ): struct CommandData_FrJ Data; break;
+        // FrM_
         case FourCC( "FS__" ): struct CommandData_FS Data; break;
+        case FourCC( "GCAD" ): struct CommandData_GCAD Data; break; // 0x140e18020
         case FourCC( "GCAP" ): struct CommandData_GCAP Data; break;
         case FourCC( "GGGg" ): struct CommandData_GGGg Data; break;
         case FourCC( "GPoe" ): struct CommandData_GPoe Data; break;
+        case FourCC( "ImAn" ): struct CommandData_ImAn Data; break; // 0x140e18a20
         case FourCC( "ImDp" ): struct CommandData_ImDp Data; break;
+        case FourCC( "InVn" ): struct CommandData_InVn Data; break; // 0x140e1f230
         case FourCC( "LBX_" ): struct CommandData_LBX Data; break;
         case FourCC( "MAA_" ): struct CommandData_MAA Data; break;
         case FourCC( "MAAB" ): struct CommandData_MAAB Data; break;
         case FourCC( "MAB_" ): struct CommandData_MAB Data; break;
+        case FourCC( "MAF_" ): struct CommandData_MAF Data; break; // 0x140e3ceb0
         case FourCC( "MAI_" ): struct CommandData_MAI Data; break;
         case FourCC( "MAlp" ): struct CommandData_MAlp Data; break;
         case FourCC( "MAt_" ): struct CommandData_MAt Data; break;
@@ -319,6 +335,7 @@ typedef struct
         case FourCC( "MCSd" ): struct CommandData_MCSd Data; break;
         case FourCC( "MDt_" ): struct CommandData_MDt Data; break;
         case FourCC( "MFts" ): struct CommandData_MFts Data; break;
+        case FourCC( "MGd_" ): struct CommandData_MGd Data; break; // 0x140e16c80
         case FourCC( "MIc_" ): struct CommandData_MIc Data; break;
         case FourCC( "ML__" ): struct CommandData_ML Data; break;
         case FourCC( "MLa_" ): struct CommandData_MLa Data; break;
@@ -329,6 +346,7 @@ typedef struct
         case FourCC( "MRot" ): struct CommandData_MRot Data; break;
         case FourCC( "MScl" ): struct CommandData_MScl Data; break;
         case FourCC( "MSD_" ): struct CommandData_MSD Data; break;
+        case FourCC( "MSel" ): struct CommandData_MSel Data; break; // 0x140e1e9e0
         case FourCC( "Msg_" ): 
 		{
 			if( DataSize == 0xB0 ) // P5R fix
@@ -340,6 +358,7 @@ typedef struct
 		}
         case FourCC( "MsgR" ): struct CommandData_MsgR Data; break;
         case FourCC( "MSSs" ): struct CommandData_MSSs Data; break;
+        case FourCC( "MTr_" ): struct CommandData_MTr Data; break; // 0x140e3e930
         case FourCC( "MvCt" ): struct CommandData_MvCt Data; break;
         case FourCC( "MvPl" ): struct CommandData_MvPl Data; break;
         case FourCC( "PBDs" ): struct CommandData_PBDs Data; break;
@@ -347,21 +366,29 @@ typedef struct
         case FourCC( "PBRd" ): struct CommandData_PBRd Data; break;
         case FourCC( "PBSt" ): struct CommandData_PBSt Data; break;
         case FourCC( "PCc_" ): struct CommandData_PCc Data; break;
+        case FourCC( "PCr_" ): struct CommandData_PCr Data; break; // 0x140e14f90
         case FourCC( "PLf_" ): struct CommandData_PLf Data; break;
+        case FourCC( "PMc_" ): struct CommandData_PMc Data; break; // 0x140e17490
         case FourCC( "PRum" ): struct CommandData_PRum Data; break;
         case FourCC( "Scr_" ): struct CommandData_Scr Data; break;
         case FourCC( "SFlt" ): struct CommandData_SFlt Data; break;
+        case FourCC( "SFts" ): struct CommandData_SFts Data; break;
         case FourCC( "SsCp" ): struct CommandData_SsCp Data; break;
         case FourCC( "TCol" ): struct CommandData_TCol Data; break;
+        // Tex_
+        case FourCC( "TMSE" ): struct CommandData_TMSE Data; break; // 0x140e19560
         case FourCC( "TRgs" ): struct CommandData_TRgs Data; break;
         case FourCC( "TrMt" ): struct CommandData_TrMt Data; break;
         case FourCC( "TScl" ): struct CommandData_TScl Data; break;
+        case FourCC( "WpCi" ): struct CommandData_WpCi Data; break; // 0x140e1c200
+        case FourCC( "WpHo" ): struct CommandData_WpHo Data; break; // 0x140e1c550
 
         // ECS
         case FourCC( "SBE_" ): struct CommandData_SBE Data; break;
         case FourCC( "SBEA" ): struct CommandData_SBEA Data; break;
         case FourCC( "SFts" ): struct CommandData_SFts Data; break;
         case FourCC( "Snd_" ): struct CommandData_Snd Data; break;
+        case FourCC( "SndF" ): struct CommandData_SndF Data; break; // 0x140e28380
 		
 		
 
@@ -1783,6 +1810,225 @@ typedef struct
     f32 Field0C;
 } CommandData_TScl;
 
+typedef struct {
+    u32 Field00;
+} CommandData_CCS;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+} CommandData_CiSt;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u16 Field08;
+    u16 Field0A;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+    u32 Field2C;
+    u32 Field30;
+    u32 Field34;
+    u32 Field38;
+    u32 Field3C;
+} CommandData_CMC;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_CwD;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+} CommandData_ESN;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+} CommandData_FMtn;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u8 Field08;
+    u8 Field09;
+    u8 Field0A;
+    u8 Field0B;
+    u32 Field0C;
+} CommandData_FOA;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_GCAD;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_ImAn;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+    u32 Field2C;
+} CommandData_InVn;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_MAF;
+
+typedef struct {
+    u32 Field00;
+    u8 Field04;
+    u8 Field05;
+    u8 Field06;
+    u8 Field07;
+    u8 Field08;
+    u8 Field09;
+    u8 Field0A;
+    u8 Field0B;
+    u8 Field0C;
+    u8 Field0D;
+    u8 Field0E;
+    u8 Field0F;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+    u32 Field2C;
+} CommandData_MGd;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+} CommandData_MSel;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_MTr;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+    u32 Field2C;
+    u32 Field30;
+    u32 Field34;
+    u32 Field38;
+    u32 Field3C;
+    u32 Field40;
+    u32 Field44;
+} CommandData_PCr;
+
+typedef struct {
+    u32 Field00;
+    u16 Field04;
+    u16 Field06;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+} CommandData_PMc;
+
+typedef struct {
+    u16 Field00;
+    u16 Field02;
+    u16 Field04;
+    u16 Field06;
+    u16 Field08;
+    u16 Field0A;
+    u16 Field0C;
+    u16 Field0E;
+} CommandData_TMSE;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+    u32 Field10;
+    u32 Field14;
+    u32 Field18;
+    u32 Field1C;
+}CommandData_WpCi;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_WpHo;
+
 // ECS
 typedef struct
 {
@@ -1799,6 +2045,13 @@ typedef struct
     u32 Field08;
     u32 Field0C;
 } CommandData_SBEA;
+
+typedef struct {
+    u32 Field00;
+    u32 Field04;
+    u32 Field08;
+    u32 Field0C;
+} CommandData_SndF;
 
 typedef struct
 {
