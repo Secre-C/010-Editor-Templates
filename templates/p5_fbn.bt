@@ -151,20 +151,19 @@ typedef struct
 
 typedef struct
 {
-    LittleEndian();
     CherryRandomColor();
-    struct
-    {
-        Bitflag TrueFlag<name = "Enabling Bitflag ">; //Adachi True!
-        Bitflag TrueFlag<name = "Enabling Bitflag ">;
-        Bitflag TrueFlag<name = "Enabling Bitflag ">;
-        Bitflag FalseFlag<name = "Disabling Bitflag ">;
-        Bitflag FalseFlag<name = "Disabling Bitflag ">;
-        Bitflag FalseFlag<name = "Disabling Bitflag ">;
-    } Bitflags <name = "Entry Bitflags">;
+	struct
+	{
+		Bitflag TrueFlag<name = "Enabling Bitflag ">; //Adachi True!
+		Bitflag TrueFlag<name = "Enabling Bitflag ">;
+		Bitflag TrueFlag<name = "Enabling Bitflag ">;
+		Bitflag FalseFlag<name = "Disabling Bitflag ">;
+		Bitflag FalseFlag<name = "Disabling Bitflag ">;
+		Bitflag FalseFlag<name = "Disabling Bitflag ">;
+	} Bitflags <name = "Entry Bitflags">;
     CherryRandomColor();
     u8 PaddingByte;
-    enum <u8> { Autohit = 0, Hit = 2 } HitType;
+    u8 HitType;
     u16 NameID;
     u16 ProcedureIndex;
     enum<short>
