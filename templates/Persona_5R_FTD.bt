@@ -205,11 +205,11 @@ typedef struct
 	u16 ShopBannerID;
 	bool HideNameTag;
 	enum<u8>{
-		BannerYenEnableback = 0,
-		SharedPointsEnableback = 1,
-		SharedCasinoEnableback = 2,
-		SharedYenEnableback = 3,
-		SharedYenDisableback = 4
+		Banner_Yen_Enableback = 0,
+		Shared_Points_Enableback = 1,
+		Shared_Casino_Enableback = 2,
+		Shared_Yen_Enableback = 3,
+		Shared_Yen_Disableback = 4
 	}shopMode;
 }fclPublicShopDataFtd<read=(SPrintf(s, "Banner -> %02d; DisableNametag -> %s", ShopBannerID, HideNameTag? "true":"false"))>;
 
@@ -230,7 +230,7 @@ string mapTableRead( fldMapEntry &o )
 typedef struct( u32 entrySize, string fileName )
 {
     SetRandomBackColor();
-
+	local string readString;
     switch ( fileName )
     {
         case "datEncountPack":
@@ -318,73 +318,62 @@ typedef struct( u32 entrySize, string fileName )
 			break;
 		
 		case "cmmFunctionTable":
-			struct
-			{
-				ConfidantFunction_Type FunctionType <name = "Function Type">;
-				short Rank <name = "Unlocks at Rank:">;
-				ConfidantFunction Function <name = "Confidant Function">;
-				short Unknown <name = "Unknown">;
-				Bitflag EnablingBitflag;
-			} Table_cmmFunction[ 10 ] <name = "Confidant Functions", read=Str("Function Type: %s || Function ID: %02d || Rank %02d || Enabling Bitflag: %05d", EnumToString(FunctionType), Function, Rank, FlagConvert(EnablingBitflag))>;
+			ConfidantFunction_Type FunctionType <name = "Function Type">;
+			short Rank <name = "Unlocks at Rank:">;
+			ConfidantFunction Function <name = "Confidant Function">;
+			short Unknown <name = "Unknown">;
+			Bitflag EnablingBitflag;
+			readString=Str("Function Type: %s || Function ID: %02d || Rank %02d || Enabling Bitflag: %05d", EnumToString(FunctionType), Function, Rank, FlagConvert(EnablingBitflag));
 			break;
 			
 		case "cmmFunctionInfoTable":
-			struct
-			{
-				ConfidantFunction_Type FunctionType <name = "Function Type">;
-				short FunctionByArcana <name = "Confidant Function">;
-				int unk0;
-			} Table_cmmFunctionInfo <name = "Confidant Function Info", read=Str("Function Type: %s, Function ID: %d", EnumToString(FunctionType), FunctionByArcana)>;
+			ConfidantFunction_Type FunctionType <name = "Function Type">;
+			short FunctionByArcana <name = "Confidant Function">;
+			int unk0;
+			readString = Str("Function Type: %s, Function ID: %d", EnumToString(FunctionType), FunctionByArcana);
 			break;
 			
 		case "cmmHelp":
-			struct
-			{
-				u16 cmmHelpRank1;
-				u16 cmmHelpRank2;
-				u16 cmmHelpRank3;
-				u16 cmmHelpRank4;
-				u16 cmmHelpRank5;
-				u16 cmmHelpRank6;
-				u16 cmmHelpRank7;
-				u16 cmmHelpRank8;
-				u16 cmmHelpRank9;
-				u16 cmmHelpRank10;
-				u16 cmmHelpReverse;
-				u16 cmmHelpDoubt;
-			} Table_cmmFunctionInfo <name = "Confidant Rank Summary Descriptions">;
+			u16 cmmHelpRank1;
+			u16 cmmHelpRank2;
+			u16 cmmHelpRank3;
+			u16 cmmHelpRank4;
+			u16 cmmHelpRank5;
+			u16 cmmHelpRank6;
+			u16 cmmHelpRank7;
+			u16 cmmHelpRank8;
+			u16 cmmHelpRank9;
+			u16 cmmHelpRank10;
+			u16 cmmHelpReverse;
+			u16 cmmHelpDoubt;
 			break;
 
         case "cmpPsCoopSkillTable":
-			struct
-			{
-				PartyMember Member <name = "Party Member">;
-				short Rank <name = "Rank">;
-				BattleSkill Skill <name = "Battle Skill">;
-				short Unknown <name = "Unknown">;
-			} Table_cmpPsCoopSkillTable <name = "Party Confidant Skill Table">;
+			PartyMember Member <name = "Party Member">;
+			short Rank <name = "Rank">;
+			BattleSkill Skill <name = "Battle Skill">;
+			short Unknown <name = "Unknown">;
             break;
 
         case "fclItemLineUpTable":
 			ItemType Category : 4<format = hex, name = "Item Category">;
 			short ItemId : 12<name = "Consumable ID">;
+			readString=Str("%s %d", EnumToString(Category), ItemId);
             break;
 
         case "fclItemLineUpAccTable":
 			ItemType Category : 4<format = hex, name = "Item Category">;
 			short ItemId: 12<name = "Item ID">;
+			readString=Str("%s %d", EnumToString(Category), ItemId);
             break;
 
         case "fclCombElectItemTable":
-			struct
-			{
-				ushort Unknown;
-				ItemizationType Type : 4 <name = "Result Item Type">;
-				ushort Item : 12 <name = "Result Item ID">;
-				ushort Unknown;
-				ItemizationType Type : 4 <name = "Required Item Type">;
-				ushort Item : 12 <name = "Required Item">;
-			} TablefclCombElectItem <name = "Persona Itemization">;
+			ushort Unknown;
+			ItemizationType Type : 4 <name = "Result Item Type">;
+			ushort Item : 12 <name = "Result Item ID">;
+			ushort Unknown;
+			ItemizationType Type : 4 <name = "Required Item Type">;
+			ushort Item : 12 <name = "Required Item">;
             break;
 			
 		case "FLDDOORANIM":
@@ -399,6 +388,7 @@ typedef struct( u32 entrySize, string fileName )
 			s16 playerYOffset2;
 			s16 playerZOffset2;
 			s16 unk0;
+			readString=Str("m%03d_%03d || PlayerAnim Gap ID -> %d", DoorObjMajorId, DoorObjMinorId, FldAnimGapId);
 			break;
 			
 		case "fldDoorSE":
@@ -407,7 +397,23 @@ typedef struct( u32 entrySize, string fileName )
 			u16 DoorObjMinorId;
 			s32 DungeonAcbCueId;
 			s32 unk0;
+			readString=Str("m%03d_%03d, Cue ID -> %d", DoorObjMajorId, DoorObjMinorId, DungeonAcbCueId);
             break;
+			
+		case "FLDMODELSE":
+		case "fldModelSE":
+			s16 fldObjMajorId;
+			s16 fldObjMinorId;
+			s16 AnimationId;
+			u8 unk1;
+			u8 unk2;
+			u32 unk3;
+			u32 unk4;
+			u32 unk5[4];
+			u32 DungeonAcbCueId;
+			u32 unk6[7];
+			readString=Str("m%03d_%03d || Animation -> %d || Cue ID -> %d", fldObjMajorId, fldObjMinorId, AnimationId, DungeonAcbCueId);
+			break;
 			
 		case "fldWireAnimData":
 		case "FLDWIREANIMDATA":
@@ -429,12 +435,13 @@ typedef struct( u32 entrySize, string fileName )
 			u16 field1e;
 			u16 CameraMajor <name = "Field Camera Major ID">;
 			u16 CameraMinor <name = "Field Camera Minor ID">;
-			u16 field24;
+			u8 field24;
+			u8 CameraSub <name = "Field Camera Sub ID">;
 			u16 WireAnimID <name = "Grappling Hook (it6400_001.GMD) Animation ID">;
 			u16 FieldMajor <name = "Field Major ID">;
 			u16 FieldMinor <name = "Field Minor ID">;;
-			u16 field2c;
-			u16 field2e;
+			u16 GFSMajorID;
+			u16 GFSMinorID;
 			s32 xStartOffset <name = "X Position Start Offset">;
 			s32 yStartOffset <name = "Y Position Start Offset">;
 			s32 xStartOffset <name = "Z Position Start Offset">;
@@ -507,7 +514,7 @@ typedef struct( u32 entrySize, string fileName )
             break;
     }
 
-} FtdListEntry <optimize=false>;
+} FtdListEntry <read=readString, optimize=false>;
 
 // Field strings
 typedef struct

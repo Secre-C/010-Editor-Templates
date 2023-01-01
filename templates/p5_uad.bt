@@ -30,7 +30,7 @@ typedef struct
 {
 	s16 field00;
 	s16 field02;
-	s16 field04 <name = "despawn model timer">;
+	s16 field04 <name = "Animation Duration">;
 	s16 field06;
 	s16 animID <name = "Animation ID">;
 	s16 field0a;

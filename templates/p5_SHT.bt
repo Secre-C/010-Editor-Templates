@@ -23,7 +23,16 @@ typedef hfloat f16;
 typedef float f32;
 typedef double f64;
 
-
+typedef struct
+{
+	BitfieldRightToLeft();
+	u32 Bit0 : 1;
+	u32 Bit1 : 1;
+	u32 Bit2 : 1;
+	u32 DisableByDefault : 1;
+	u32 Bit4 : 1;
+	u32 Bit5 : 1;
+}SoundMode;
 
 typedef struct
 {
@@ -47,43 +56,38 @@ typedef struct
 
 typedef struct
 {
-	char FileName[128];	
-}FileStringSec<optimize=false>;
-
-typedef struct
-{
+	SoundMode Mode;
 	s32 Unk0;
-	s32 Unk1;
-	f32 X_Pos;
-	f32 Y_Pos;
-	f32 Z_Pos;
-	f32 Unk5;
-	f32 Unk6;
+	f32 Sound_Source_X_Pos;
+	f32 Sound_Source_Y_Pos;
+	f32 Sound_Source_Z_Pos;
+	f32 Sound_Fade_Something;
+	f32 Sound_Range;
 	s32 CueID;
-	s32 Unk8;
-	s32 Unk9;
-}Type2Data<optimize=false>;
+	s32 Unk1;
+	s32 Sound_Id;
+}Type2Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
 
 typedef struct
 {
 	s32 Unk0;
-	f32 Unk1;
-	f32 Unk2;
+	f32 Sound_Fade_Something;
+	f32 Sound_Range;
 	s32 CueID;
 	s32 Unk4;
-	s32 Unk5;
+	s32 Sound_Id;
 	s32 Unk6;
 	s32 Unk7;
 	s32 Unk8;
 	s16 Unk9;
 	s16 Unk10;
-	f32 Unk11;
-	f32 Unk12;
-	f32 Unk13;
-	f32 Unk14;
-	f32 Unk15;
-	f32 Unk16;
-}Type3Data<optimize=false>;
+	f32 Sound_Source_X_Pos;
+	f32 Sound_Source_Y_Pos;
+	f32 Sound_Source_Z_Pos;
+	f32 Sound_Source_X_Pos2;
+	f32 Sound_Source_Y_Pos2;
+	f32 Sound_Source_Z_Pos2;
+}Type3Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
 
 typedef struct
 {
@@ -94,20 +98,26 @@ typedef struct
 	f32 Unk4;
 	s32 Unk5;
 	s32 CueID;
-	s32 Unk7;
-}Type4Data<optimize=false>;
+	s32 Sound_Id;
+}Type4Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
 
 
 typedef struct
 {
-	u32 Type;
+	enum<u32>
+	{
+		SHT_FilenameDeclaration = 1,
+		SHT_AmbientSounds		= 2,
+		SHT_SeasonalSounds   	= 3,
+		SHT_SoundEffects        = 4,
+	}Type;
 	u32 Version<name="Version">;
 	u32 SectionSize<name="Section Size">;
 	u32 Unk1;
 	if (Type == 1)
 	{
-		FileStringSec AWB;
-		FileStringSec ACB;
+		char AWB[128];
+		char ACB[128];
 	}
 	else
 	{
@@ -129,8 +139,7 @@ typedef struct
 		Type4Data Type_4_Data[Entry_Num];
 	}
 	
-	
-}SectionData<optimize=false>;
+}SectionData<read=Str("Type %d -> %s", Type, EnumToString(Type)), optimize=false>;
 
 typedef struct
 { 

@@ -19,10 +19,43 @@ typedef double f64;
 
 typedef struct
 {
-		f32 Unknown3;
-		f32 Unknown4;
-		f32 Unknown5;
-} Type3SubStruct<name="Entry", optimize=false>;
+	char Signature[4];
+	int Version<format=hex>;
+	
+	if (Version != 0x1000004) //is not vanilla
+	{
+		LittleEndian();
+	}
+	
+	int unk0;
+	int fileSize; //seems to always be between 0x10 or 0x20 more than the actual filesize though
+	int unk1[6];
+	int entryCount;
+	f32 unk2[9];
+	
+	if (Version == 0x5000001)
+	{
+		f32 RoyalOnlyValue;
+	}
+	else if (Version == 0x6000001)
+	{
+		f32 RoyalOnlyValues[3];
+	}
+	
+	struct
+	{
+		f32 Unk21<name="Point 2 Movement X">;
+		f32 Unk22<name="Point 2 Movement Y">;
+		f32 Unk23<name="Point 2 Movement Z">;
+		f32 Unk24<name="Point 1 Movement X">;
+		f32 Unk25<name="Point 1 Movement Y">;
+		f32 Unk26<name="Point 1 Movement Z">;
+		f32 Unk27<name="Point 2 Target X">;
+		f32 Unk28<name="Point 2 Target Y">;
+		f32 Unk29<name="Point 2 Target Z">;
+		f32 Unk30<name="Point 1 Target X">;
+	}PCD[entryCount];
+}PCDHeader<optimize=false>;
 
 typedef struct
 {
@@ -67,7 +100,7 @@ typedef struct
 	f32 Unk38<name="Start Point Something angle-related">;
 	f32 Unk39<name="Start Point Angle">;
 	f32 Unk40<name="Start Point FOV">;
-}PCD<optimize=false>;
+}oldPCD<optimize=false>;
 
 BigEndian();
-PCD Segment;
+PCDHeader Header;
