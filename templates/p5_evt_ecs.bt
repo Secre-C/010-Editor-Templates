@@ -193,7 +193,7 @@ typedef struct
 
     if ( Type == ObjectType_Enemy ) // If the Object type is an Enemy...  
     {
-        u32 UnitTableIndex;         // ...This field uses the unit ID in UNIT.TBL (which chooses which model to load)
+        u32 ResourceMajorId<name="Unit Table Index">;         // ...This field uses the unit ID in UNIT.TBL (which chooses which model to load)
     }    
     else 
     {
@@ -235,8 +235,7 @@ typedef struct
         Count = 4
 	}FlagType;
 	
-    //Bitflag FlagId; //flag ID, Count ID, or Evt Local Data ID
-    u32 FlagId;
+    Bitflag FlagId; //flag ID, Count ID, or Evt Local Data ID
 	u32 FlagValue; //Value result stored in flagID
 	
     enum<u32>{
