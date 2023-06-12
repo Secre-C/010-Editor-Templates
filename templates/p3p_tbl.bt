@@ -236,14 +236,14 @@ typedef struct
     PersonaStats Stats;
     byte : 1;
     BattleSkill SkillID[ 8 ] <name = "Battle Skills">;
-    u16 ExpReward <name = "EXP Reward">;
-    u16 MoneyReward <name = "Money Reward">;
-    u16 Unknown4;
-    u16 Unknown5;
-    u8 Unknown6[ 18 ];
-    b16 Unknown7;
-    b16 Unknown8;
-    u16 AttackDamage <name = "Attack Damage">;
+    FuukaScan ScanType <name = "FuukaScan", comment = "Determines the effectiveness of Fuukas scan">;
+    u16 ExpReward <name = "Exp Reward">;
+    ItemDrop Reward <name = "ItemDrop">;
+    u16 DropRate <name = "Drop Rate out of 200">;
+    u8 QuestDrops[ 18 ] <comment = "Changes for enemies with possible quest drops, needs more research">;
+    u16 AttackAccuracy <name = "AttackAccuracy">;
+    u16 AttackDamage <name = "AttackDamage">;
+    AttackType SkillID <name = "AttackType">;
 } TEnemyUnitStats <name = "Enemy Unit Stats">;
 
 // SKILL.TBL
@@ -281,14 +281,13 @@ typedef struct
 
     TargetStatus Status<name = "Target Status", comment = "for revival skills">;
     u8 Unknown <name = "Unknown">;
-    u8 Unknown <name = "Unknown">; //Skill_TargetRestrictions TargetRestrictions <name = "Additional Target Restrictions">;
-    u8 Unknown <name = "Unknown", comment = "seems to check if there are any available targets (healing related) in conjuction with above variable. Needs testing">;
+    Skill_AilmentTargetType AilmentTargetType <name = "Ailment Target Type">; //Skill_TargetRestrictions TargetRestrictions <name = "Additional Target Restrictions">;
+    Skill_AilmentTargets AilmentTargets <name = "Ailment Target", comment = "seems to check if there are any available targets with ailments in conjuction with above variable. Needs testing">;
     u8 SkillAccuracy <name = "Skill's Accuracy">;
     u8 MinHit <name = "Minimum Amount of Hits">;
     u8 MaxHit <name = "Maximum Amount of Hits">;
     Skill_HPEffect Healing1 <name = "Health Change Type">;
-    u8 Healing2 <name = "Health Change Value">;
-    u8 Healing3 <name = "Health Change Value x256">;
+    u16 Healing2 <name = "Health Change Value">;
     Skill_SPEffect SPGain <name = "Type of SP Gain">;
     u8 Unknown <name = "Unknown">;
     u16 Sp2 <name = "SP Amount">;
@@ -299,21 +298,19 @@ typedef struct
 
 				   struct
         {
+            bool Dizzy : 1 <name = "Dizzy">;
             bool Charm : 1 <name = "Charm">;
             bool Distress : 1 <name = "Distress">;
             bool Panic : 1 <name = "Panic">;
-            bool Fear : 1 <name = "Fear">;
-            bool Rage : 1 <name = "Rage	">;
+            bool Fear : 1 <name = "Fear	">;
+            bool Rage : 1 <name = "Rage">;
             bool Freeze : 1 <name = "Freeze">;
             bool Shock : 1 <name = "Shock">;
             bool Poison : 1 <name = "Poison">;
-        } Effect2 <name = "Ailments">;
-
-	struct
-     {
-         bool Unconscious : 1 <name = "Unconscious">;
-         bool KnockDown : 1 <name = "Knocked Down">;
-     } Effect4 <name = "Member Status", comment = "I think this is unused but idk keeping just in case -Phoenix">;
+            bool OrgiaMode : 1 <name = "OrgiaMode">;
+            bool Overheat : 1 <name = "Overheat">;
+            bool Tired : 1 <name = "Tired", comment = "Applies animation when low HP or Tired. Doesn't seem to affect anything.">;
+        } Effect2 <name = "Effects">;
 	 
     Skill_SpecialAilments SpecialAil <name = "Special Ailments">;
     u8 Unknown <name = "Unknown">;

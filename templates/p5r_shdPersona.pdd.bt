@@ -51,5 +51,5 @@ int R_unk3;
 for ( i = 0; i < numOfBlocks; i++ )
 {
   SetBackColor( ( i % 2 ) * 0x440000 + 0x880000 );
-  PDD pdd<read="use ID - 259">;
+  PDD pdd;
 }
