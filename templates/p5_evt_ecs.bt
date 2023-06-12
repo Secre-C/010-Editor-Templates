@@ -1100,8 +1100,14 @@ typedef struct
 typedef struct
 {
     u32 Field00;
-    u32 Field04;
-    u32 Field08;
+	
+    enum<u32>{
+		rankup,
+		max,
+		gameover,
+	}PoemType;
+	
+    u32 PoemMajorId;
     u32 Field0C;
 } CommandData_GPoe;
 

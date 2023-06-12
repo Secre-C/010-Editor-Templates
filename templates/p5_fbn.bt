@@ -306,7 +306,7 @@ typedef struct
     s16 Model_MajorID;
     s16 Model_MinorID;
     u16 Grapple_ResourceHandle;
-    u16 Unk01;
+    s16 Unk01;
     u16 JumpLength;
     u16 JumpHeight;
 } FbnGrappleObject <optimize = false, read = ( Str(  "Model :  M%03i_%03i.GMD   ||   RESHND :  %i   ||   Sequence ID :  %i   ||   Position :  %g, %g, %g", Model_MajorID, Model_MinorID, Grapple_ResourceHandle, Wire_SequenceID, Position.X, Position.Y, Position.Z  ) )>;

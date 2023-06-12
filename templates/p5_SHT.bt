@@ -108,7 +108,7 @@ typedef struct
 	{
 		SHT_FilenameDeclaration = 1,
 		SHT_AmbientSounds		= 2,
-		SHT_SeasonalSounds   	= 3,
+		SHT_WeatherSounds   	= 3,
 		SHT_SoundEffects        = 4,
 	}Type;
 	u32 Version<name="Version">;
@@ -142,20 +142,31 @@ typedef struct
 }SectionData<read=Str("Type %d -> %s", Type, EnumToString(Type)), optimize=false>;
 
 typedef struct
-{ 
-    u16 CharModel;
-}Crowd<optimize=false, read=TypeRead>;
-
-string TypeRead(Crowd& block )
 {
-    char buffer[32];
-    SPrintf( buffer, "Character %02d", block.CharModel );
-    return buffer;
+	s16 fieldMajor;
+	s16 fieldMinor;
+	u16 Something_ID;
+	u16 unk1;
+	u16 SHT_SoundID;
+	s32 unk3[7];
+}envse<read=Str("f%03d_%03d_0.GMD || SHT Sound: %d", fieldMajor, fieldMinor, SHT_SoundID)>;
+
+// Read file
+local string filePath = GetFileName();
+local string fileName = FileNameGetBase( filePath, false );
+local string fileExt = FileNameGetExtension( filePath );
+
+if (fileExt == ".bin")
+{
+	LittleEndian();
+	envse envSE_Section[FileSize() / 38];
 }
-
-BigEndian();
-SHTHeader Header;
-while (FEof() == 0)
+else if (fileExt == ".SHT" || fileExt == ".sht")
 {
-	SectionData Section;
+	BigEndian();
+	SHTHeader Header;
+	while (FEof() == 0)
+	{
+		SectionData Section;
+	}
 }

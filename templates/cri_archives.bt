@@ -363,7 +363,7 @@ typedef struct(u32 stringPoolOffset, u32 dataPoolOffset, ECriEncodingType encodi
         // Null value
     }
     
-} TCriField <optimize=false>;
+} TCriField <optimize=false, read=Str(TCriStringToString(Name))>;
 
 typedef struct 
 {

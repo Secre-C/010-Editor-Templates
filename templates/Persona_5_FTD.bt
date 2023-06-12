@@ -475,6 +475,22 @@ typedef struct( u32 entrySize, string fileName )
 			u16 field6c;
 			u16 field6e;
 			break;
+			
+		case "fldAddActAnim":
+		case "FLDADDACTANIM":
+			s16 fldObjMajorId;
+			s16 fldObjMinorId;
+			u8 fldAnimGapID;
+			u8 unk0;
+			s16 unk01;
+			s16 unk1;
+			s16 unk2;
+			s32 unk3;
+			s16 unk4;
+			s16 unk5;
+			s32 unk6;
+			//readString=Str("m%03d_%03d || PlayerAnim Gap ID -> %d", fldObjMajorId, fldObjMinorId, fldAnimGapID);
+			break;
 
         default:
             u8 Data[ entrySize ];

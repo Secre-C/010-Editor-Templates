@@ -24,7 +24,7 @@ typedef struct
 	s16 Field04 <name = "Default Player Cursor X Position">;
 	s16 Field06 <name = "Default Player Cursor Y Position">;
 	s16 TexpackId <name = "Texpack entry ID">;
-	s16 Field0a;
+	s16 TexlistBlock;
 	enum<u32>
 	{
 		No_Minimap = 0,
@@ -53,14 +53,14 @@ typedef struct
 	s32 LayerCount;
 	f32 Field3c;
 	Bitflag a_Flag_Thing;
-	f32 Field00;
-	f32 Field04;
-	f32 Field08;
-	f32 Field0c;
-	f32 Field10;
-	f32 Field14;
-	f32 Field18;
-	f32 Field1c;
+	f32 Layer_1_Ceiling_Height;
+	f32 Layer_2_Ceiling_Height;
+	f32 Layer_3_Ceiling_Height;
+	f32 Layer_4_Ceiling_Height;
+	f32 Layer_5_Ceiling_Height;
+	f32 Layer_6_Ceiling_Height;
+	f32 Layer_7_Ceiling_Height;
+	f32 Layer_8_Ceiling_Height;
 	Bitflag Field20<name = "Show Red Unexplored Areas Enabling Bitflag">;
 	s16 texpack_title_ftd_entry;
     s16 Field26;
@@ -87,19 +87,15 @@ typedef struct
 typedef struct
 {
 	SetRandomBackColor();
-	s16 Field00;
-	s16 Field02;
-	s16 Field04;
-	s16 Field06;
-	s8 Field08;
-	s8 Field09;
-	s8 Field0a;
-	s8 Field0b;
-	s8 Field0c;
-	s8 Field0d;
-	s8 Field0e;
-	s8 Field0f;
-}texelem;
+	s16 TexpackID <name = "Texpack ID">;
+	s8 Field02;
+	s8 TexpackIDIndex<name = "Texpack ID Index?">;
+	s16 PalaceTitle;
+	s16 RoomTitle;
+	Bitflag flag;
+	s16 Map_X_Offset;
+	s16 Map_Y_Offset;
+}texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackIDIndex, FlagConvert(flag))>;
 
 local int field00 = 0;
 local int ddsIndex;
@@ -291,8 +287,11 @@ struct
 			break;
 			
 			case "texlist":
-			SetRandomBackColor();
-			u16 unk0[fileSize / 2] <optimize = false>;
+			struct
+			{
+				SetRandomBackColor();
+				s16 texelem_entry[24] <name = "Texelem Entry Index">;
+			}texlist[fileSize / 48] <optimize = false>;
 			break;
 			
 			case "texpack":

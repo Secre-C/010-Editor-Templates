@@ -275,7 +275,7 @@ typedef struct
     SetBackColor( MyRandom( 0xFFFFFFFF ) );    
 	f32 Field290<name = "Field Shadow Far Clip">;
 	f32 Field294;
-	f32 Field298;
+	f32 Field298<name = "Character Shadow Transparency Factor">;
 	f32 Field29C;
 	u32 Field2A0;
 	f32 Field2A4<name = "Field Shadow Near Clip">;
