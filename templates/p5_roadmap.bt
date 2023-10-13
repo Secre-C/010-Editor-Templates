@@ -62,12 +62,7 @@ typedef struct
 	f32 Layer_7_Ceiling_Height;
 	f32 Layer_8_Ceiling_Height;
 	Bitflag Field20<name = "Show Red Unexplored Areas Enabling Bitflag">;
-	s16 texpack_title_ftd_entry;
-    s16 Field26;
-	s16 Field28;
-	s16 Field2a;
-	s16 Field2c;
-	s16 Field2e;
+	s16 texelem_index_layer[6];
 	s16 Field30;
 	s16 Field32;
 	
@@ -88,13 +83,13 @@ typedef struct
 	SetRandomBackColor();
 	s16 TexpackID <name = "Texpack ID">;
 	s8 Field02;
-	s8 TexpackIDIndex<name = "Texpack ID Index?">;
-	s16 PalaceTitle;
-	s16 RoomTitle;
+	s8 TexpackMapLayer<name = "Texpack Map Layer">;
+	s16 TexpackPalaceTitle;
+	s16 TexpackRoomTitle;
 	Bitflag flag;
 	s16 Map_X_Offset;
 	s16 Map_Y_Offset;
-}texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackIDIndex, FlagConvert(flag))>;
+}texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackMapLayer, FlagConvert(flag))>;
 
 local int field00 = 0;
 local int ddsIndex;
@@ -151,6 +146,8 @@ typedef struct {
 		Gray_Arrow_Down_Left = 38,
 		Gray_Arrow_Down_Right = 39,
 		Palace_Ruler_Treasure = 40,
+		Area_Mask3 = 41,
+		Area_Mask4 = 42,
 		Yellow_Check_Mark = 43,
 		Will_Seed = 97,
 	}MapIcon <name = "Map Mode/Icon ID">;
@@ -289,7 +286,7 @@ struct
 			struct
 			{
 				SetRandomBackColor();
-				s16 mapThing[24];
+				s16 texelem_entry[24] <name = "Texelem Entry Index">;
 			}texlist[fileSize / 48] <optimize = false>;
 			break;
 			

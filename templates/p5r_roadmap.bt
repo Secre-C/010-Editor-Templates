@@ -62,12 +62,7 @@ typedef struct
 	f32 Layer_7_Ceiling_Height;
 	f32 Layer_8_Ceiling_Height;
 	Bitflag Field20<name = "Show Red Unexplored Areas Enabling Bitflag">;
-	s16 texpack_title_ftd_entry;
-    s16 Field26;
-	s16 Field28;
-	s16 Field2a;
-	s16 Field2c;
-	s16 Field2e;
+	s16 texelem_index_layer[6];
 	s16 Field30;
 	s16 Field32;
 	int unk0;
@@ -89,13 +84,13 @@ typedef struct
 	SetRandomBackColor();
 	s16 TexpackID <name = "Texpack ID">;
 	s8 Field02;
-	s8 TexpackIDIndex<name = "Texpack ID Index?">;
-	s16 PalaceTitle;
-	s16 RoomTitle;
+	s8 TexpackMapLayer<name = "Texpack Map Layer">;
+	s16 TexpackPalaceTitle;
+	s16 TexpackRoomTitle;
 	Bitflag flag;
 	s16 Map_X_Offset;
 	s16 Map_Y_Offset;
-}texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackIDIndex, FlagConvert(flag))>;
+}texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackMapLayer, FlagConvert(flag))>;
 
 local int field00 = 0;
 local int ddsIndex;
@@ -152,6 +147,8 @@ typedef struct {
 		Gray_Arrow_Down_Left = 38,
 		Gray_Arrow_Down_Right = 39,
 		Palace_Ruler_Treasure = 40,
+		Area_Mask3 = 41,
+		Area_Mask4 = 42,
 		Yellow_Check_Mark = 43,
 		Will_Seed = 97,
 	}MapIcon <name = "Map Mode/Icon ID">;
@@ -174,41 +171,7 @@ typedef struct {
 		
 		structRead = Str("%s || Flag %05d", IconId, FlagConvert( reqFlag ));
 	}
-	else if (MapIcon == 1)
-	{
-		f32 mapPartX <name = "Map Part X">;
-		f32 mapPartY <name = "Map Part Y">;
-		f32 mapPartSizeX <name = "Map Part X Size">;
-		f32 mapPartSizeY <name = "Map Part Y Size">;
-		f32 mapPartNewX <name = "Map Part New X Pos">;
-		f32 mapPartNewY <name = "Map Part New Y Pos">;
-		Bitflag reqFlag <name = "Bitflag Requirement">;
-		flagEffect effect <name = "Flag Enable Effect">;
-		struct{
-			f32 TopLeftX;
-			f32 TopLeftY;
-		}TopLeftMaskCorner<read=Str("X: %f, Y: %f", TopLeftX, TopLeftY)>;
-		
-		struct{
-			f32 TopRightX;
-			f32 TopRightY;
-		}TopRightMaskCorner<read=Str("X: %f, Y: %f", TopRightX, TopRightY)>;
-		
-		struct{
-			f32 BottomLeftX;
-			f32 BottomLeftY;
-		}BottomLeftMaskCorner<read=Str("X: %f, Y: %f", BottomLeftX, BottomLeftY)>;
-		
-		struct{
-			f32 BottomRightX;
-			f32 BottomRightY;
-		}BottomRightMaskCorner<read=Str("X: %f, Y: %f", BottomRightX, BottomRightY)>;
-		
-		s32 Field44;
-		
-		structRead = Str("%s || Flag %05d", IconId, FlagConvert( reqFlag ));
-	}
-	else if (MapIcon == 27 || MapIcon == 18)
+	else if (MapIcon == 1 || MapIcon == 27 || MapIcon == 18)
 	{
 		f32 mapPartX <name = "Map Part X">;
 		f32 mapPartY <name = "Map Part Y">;
