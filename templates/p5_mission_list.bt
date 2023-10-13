@@ -1,0 +1,38 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: 
+//   Authors: SecreC.
+//   Version: 
+//   Purpose: 
+//  Category: Persona 5
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "common/include.h"
+
+typedef struct
+{
+	Bitflag EnablingBitflag;
+	Bitflag DisablingBitflag;
+	s32 CheckCount;
+	s32 CountRangeStart;
+	s32 CountRangeEnd;
+	s32 unk14;
+	s32 unk18;
+	s32 unk1C;
+	s16 unk20;
+	s16 unk24;
+}missionTable<read=Str("E/D Bitflag: %05d / %05d || Count %03d Range -> %05d - %05d", FlagConvert(EnablingBitflag), FlagConvert(DisablingBitflag), CheckCount, CountRangeStart, CountRangeEnd), optimize=false>;
+
+LittleEndian();
+
+local int64 fileSize = FileSize();
+local string filePath = GetFileName();
+local string fileName = FileNameGetBase( filePath, false );
+local string fileExt = FileNameGetExtension( filePath );
+
+s32 something;
+missionTable missionTableStruct[fileSize / 36];

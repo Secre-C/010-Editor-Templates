@@ -2,26 +2,21 @@
 //--- 010 Editor v9.0.2 Binary Template
 //
 //      File: *.ftd
-//   Authors: DeathChaos
+//   Authors: DeathChaos, SecreC.
 //   Version: 1.00
 //   Purpose: Persona 5 Field BGM Data
 //   History
 //   1.00    2020-04-21  DeathChaos - started this
 //------------------------------------------------------------------------------
 
-typedef char bool;
-typedef char s8;
-typedef uchar u8;
-typedef int16 s16;
-typedef uint16 u16;
-typedef int16 s16;
-typedef int32 s32;
-typedef uint32 u32;
-typedef int64 s64;
-typedef uint64 u64;
-typedef hfloat f16;
-typedef float f32;
-typedef double f64;
+#include "common/include.h"
+
+typedef struct
+{
+	f32 X;
+	f32 Y;
+	f32 Z;
+}Vec3;
 
 typedef struct
 {
@@ -36,6 +31,7 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
     u32 Sig<name="Signature">;
 	u32 Version<name="Version">;
 	u32 Unk1;
@@ -44,6 +40,7 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
     u32 Unk0;
 	u32 Version<name="Version">;
 	u32 SectionSize<name="Section Size">;
@@ -56,12 +53,13 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
 	SoundMode Mode;
 	s32 Unk0;
 	f32 Sound_Source_X_Pos;
 	f32 Sound_Source_Y_Pos;
 	f32 Sound_Source_Z_Pos;
-	f32 Sound_Fade_Something;
+	f32 Sound_Distance_Fade_Threshold;
 	f32 Sound_Range;
 	s32 CueID;
 	s32 Unk1;
@@ -70,6 +68,7 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
 	s32 Unk0;
 	f32 Sound_Fade_Something;
 	f32 Sound_Range;
@@ -79,21 +78,17 @@ typedef struct
 	s32 Unk6;
 	s32 Unk7;
 	s32 Unk8;
-	s16 Unk9;
+	s16 Sound_Sources;
 	s16 Unk10;
-	f32 Sound_Source_X_Pos;
-	f32 Sound_Source_Y_Pos;
-	f32 Sound_Source_Z_Pos;
-	f32 Sound_Source_X_Pos2;
-	f32 Sound_Source_Y_Pos2;
-	f32 Sound_Source_Z_Pos2;
+	Vec3 Sources[Sound_Sources];
 }Type3Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
 
 typedef struct
 {
+	SetRandomBackColor();
 	s32 Unk0;
-	f32 Unk1;
-	f32 Unk2;
+	f32 Sound_Distance_Fade_Threshold;
+	f32 Sound_Range;
 	f32 Unk3;
 	f32 Unk4;
 	s32 Unk5;
@@ -104,6 +99,7 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
 	enum<u32>
 	{
 		SHT_FilenameDeclaration = 1,
@@ -143,9 +139,10 @@ typedef struct
 
 typedef struct
 {
+	SetRandomBackColor();
 	s16 fieldMajor;
 	s16 fieldMinor;
-	u16 Something_ID;
+	u16 Some_ID;
 	u16 unk1;
 	u16 SHT_SoundID;
 	s32 unk3[7];

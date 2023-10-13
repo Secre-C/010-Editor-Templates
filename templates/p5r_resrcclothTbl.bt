@@ -1,0 +1,44 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: p5_resrcclothTbl_bin.bt
+//   Authors: 
+//   Version: 1.0
+//   Purpose: Parse data.cpk/resource/resrcdata/resrcclothTbl.bin
+//  Category: Persona 5
+// File Mask: resrcClothTbl.bin
+//  ID Bytes:
+//   History:
+//------------------------------------------------
+
+//---------------------------------------------
+// Includes
+//---------------------------------------------
+
+#include "E:\ModsnStuff\P5 Modding maybe\modding tools\010-Editor-Templates\templates\common/include.h"
+
+//---------------------------------------------
+// Define structures
+//---------------------------------------------
+
+
+typedef struct
+{
+	u16 npcMajor;
+	u16 outfitBaseCount;
+	struct
+	{
+		u16 outfitSeasonBitfield;
+		u16 outfitBaseMinorId;
+	}outfitBaseSeason[4]<read=Str("seasonBitField -> %d, base_minor_id -> %d", outfitSeasonBitfield, outfitBaseMinorId)>;
+}clothTblEntry<read=Str("npc -> %d, baseCount -> %d", npcMajor, outfitBaseCount)>;
+
+typedef struct
+{
+	u32 entryCount;
+	u32 padding[3];
+	clothTblEntry entry[entryCount];
+}clothTbl;
+
+LittleEndian();
+clothTbl table;
