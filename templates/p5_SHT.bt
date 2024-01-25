@@ -2,129 +2,120 @@
 //--- 010 Editor v9.0.2 Binary Template
 //
 //      File: *.ftd
-//   Authors: DeathChaos, SecreC.
+//   Authors: DeathChaos, Sierra
 //   Version: 1.00
-//   Purpose: Persona 5 Field BGM Data
+//   Purpose: Persona 5 SHT data
 //   History
-//   1.00    2020-04-21  DeathChaos - started this
 //------------------------------------------------------------------------------
 
 #include "common/include.h"
 
-typedef struct
+enum fldShtType
 {
-	f32 X;
-	f32 Y;
-	f32 Z;
-}Vec3;
+	SHTTYPE_NULL = 0,
+	SHTTYPE_CONF = 1,
+	SHTTYPE_POINT = 2,
+	SHTTYPE_LINE = 3,
+	SHTTYPE_UNK = 4
+};
 
 typedef struct
 {
-	BitfieldRightToLeft();
-	u32 Bit0 : 1;
-	u32 Bit1 : 1;
-	u32 Bit2 : 1;
-	u32 DisableByDefault : 1;
-	u32 Bit4 : 1;
-	u32 Bit5 : 1;
-}SoundMode;
+    f32 X<name="X Offset">;
+    f32 Y<name="Y Offset">;
+    f32 Z<name="Z Offset">;
+} Center;
 
 typedef struct
 {
-	SetRandomBackColor();
     u32 Sig<name="Signature">;
-	u32 Version<name="Version">;
+	u32 Version<name="Version",format=hex>;
 	u32 Unk1;
 	u32 Unk2;
 }SHTHeader<optimize=false>;
 
 typedef struct
 {
-	SetRandomBackColor();
-    u32 Unk0;
-	u32 Version<name="Version">;
+    u32 FileID;
+	u32 Version<name="Version",format=hex>;
 	u32 SectionSize<name="Section Size">;
-	u32 Unk1;
+	u32 RESERVE;
 	u32 Entry_Num<name="Number of Entries">;
-	u32 Unk2;
-	u32 Unk3;
-	u32 Unk4;
+	u32 RESERVE[3];
 }DataHeader<optimize=false>;
 
 typedef struct
 {
-	SetRandomBackColor();
-	SoundMode Mode;
-	s32 Unk0;
-	f32 Sound_Source_X_Pos;
-	f32 Sound_Source_Y_Pos;
-	f32 Sound_Source_Z_Pos;
-	f32 Sound_Distance_Fade_Threshold;
-	f32 Sound_Range;
-	s32 CueID;
-	s32 Unk1;
-	s32 Sound_Id;
-}Type2Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
+	char FileName[128];	
+}FileStringSec<optimize=false>;
 
 typedef struct
 {
-	SetRandomBackColor();
-	s32 Unk0;
-	f32 Sound_Fade_Something;
-	f32 Sound_Range;
+	s32 flags<name="Flags">;
+	s32 type<name="Type">;
+	Center PointCenter<name="Point Center">;
+	f32 interior_radius;
+	f32 exterior_radius;
+	s32 CueID<name="Sound Cue ID">;
+	s32 Field_20;
+	s32 Field_24;
+}Type2Data<optimize=false, read=TypeRead1>;
+
+typedef struct
+{
+	s32 flags;
+	f32 interior_radius;
+	f32 exterior_radius;
 	s32 CueID;
 	s32 Unk4;
-	s32 Sound_Id;
+	s32 Unk5;
 	s32 Unk6;
 	s32 Unk7;
 	s32 Unk8;
-	s16 Sound_Sources;
+	s16 Unk9;
 	s16 Unk10;
-	Vec3 Sources[Sound_Sources];
-}Type3Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
+	f32 Unk11;
+	f32 Unk12;
+	f32 Unk13;
+	f32 Unk14;
+	f32 Unk15;
+	f32 Unk16;
+}Type3Data<optimize=false, read=TypeRead2>;
 
 typedef struct
 {
-	SetRandomBackColor();
 	s32 Unk0;
-	f32 Sound_Distance_Fade_Threshold;
-	f32 Sound_Range;
+	f32 Unk1;
+	f32 Unk2;
 	f32 Unk3;
 	f32 Unk4;
 	s32 Unk5;
 	s32 CueID;
-	s32 Sound_Id;
-}Type4Data<read=Str("Sound ID: %d, Cue ID: %d", Sound_Id, CueID), optimize=false>;
+	s32 Unk7;
+}Type4Data<optimize=false, read=TypeRead3>;
 
 
 typedef struct
 {
-	SetRandomBackColor();
-	enum<u32>
-	{
-		SHT_FilenameDeclaration = 1,
-		SHT_AmbientSounds		= 2,
-		SHT_WeatherSounds   	= 3,
-		SHT_SoundEffects        = 4,
-	}Type;
-	u32 Version<name="Version">;
+	u32 Type;
+	u32 Version<name="Version",format=hex>;
 	u32 SectionSize<name="Section Size">;
-	u32 Unk1;
-	if (Type == 1)
+	u32 RESERVE;
+	if (Type == SHTTYPE_CONF)
 	{
-		char AWB[128];
-		char ACB[128];
+		FileStringSec AWB<name="AWB String">;
+		FileStringSec ACB<name="ACB String">;
 	}
 	else
 	{
 		u32 Entry_Num<name="Number of Entries">;
-		u32 Unk2;
-		u32 Unk3;
-		u32 Unk4;
+		u32 RESERVE;
+		u32 RESERVE;
+		u32 RESERVE;
 	}
 	if (Type == 2)
 	{
-		Type2Data Type_2_Data[Entry_Num];
+		Type2Data Type_2_Data[Entry_Num]<name="Point Data">;
 	}
 	else if (Type == 3)
 	{
@@ -135,35 +126,40 @@ typedef struct
 		Type4Data Type_4_Data[Entry_Num];
 	}
 	
-}SectionData<read=Str("Type %d -> %s", Type, EnumToString(Type)), optimize=false>;
+	
+}SectionData<optimize=false>;
 
-typedef struct
+
+string TypeRead1(Type2Data& block )
 {
-	SetRandomBackColor();
-	s16 fieldMajor;
-	s16 fieldMinor;
-	u16 Some_ID;
-	u16 unk1;
-	u16 SHT_SoundID;
-	s32 unk3[7];
-}envse<read=Str("f%03d_%03d_0.GMD || SHT Sound: %d", fieldMajor, fieldMinor, SHT_SoundID)>;
+    char buffer[32];
+    SPrintf( buffer, "Cue ID %02d", block.CueID );
+    return buffer;
+};
 
-// Read file
-local string filePath = GetFileName();
-local string fileName = FileNameGetBase( filePath, false );
-local string fileExt = FileNameGetExtension( filePath );
-
-if (fileExt == ".bin")
+string TypeRead2(Type3Data& block )
 {
-	LittleEndian();
-	envse envSE_Section[FileSize() / 38];
+    char buffer[32];
+    SPrintf( buffer, "Cue ID %02d", block.CueID );
+    return buffer;
+};
+
+string TypeRead3(Type4Data& block )
+{
+    char buffer[32];
+    SPrintf( buffer, "Cue ID %02d", block.CueID );
+    return buffer;
+};
+
+BigEndian();
+SHTHeader Header;
+while (FEof() == 0)
+{
+	SectionData Section<read=GetSectionName>;
 }
-else if (fileExt == ".SHT" || fileExt == ".sht")
+
+string GetSectionName(SectionData &p)
 {
-	BigEndian();
-	SHTHeader Header;
-	while (FEof() == 0)
-	{
-		SectionData Section;
-	}
+	fldShtType localtype = p.Type;
+	return Str("Data Type %s", EnumToString(localtype));
 }
