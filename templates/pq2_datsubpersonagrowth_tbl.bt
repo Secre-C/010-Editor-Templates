@@ -1,47 +1,51 @@
 //------------------------------------------------
-//--- 010 Editor v9.0.2 Binary Template
+//--- 010 Editor v16.0.3 Binary Template
 //
-//      File: 
-//   Authors: Century_
+//      File: datsubpersonagrowth.tbl
+//   Authors: Century_, Lumi Platinum
 //   Version: 1.0
 //   Purpose: Parsing PQ2's datsubpersonagrowth.tbl
-//  Category: Table
+//  Category: Persona Q2
 // File Mask: *.tbl
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 
-//---------------------------------------------
-// Includes pq2_enums.bt for skill names.
-//---------------------------------------------
+//------------------------------------------------
+// Includes pq2_enums.bt for skill and persona names.
+//------------------------------------------------
 #include "pq2_enums.bt"
 
-typedef enum<byte>
-{
-    LearnableSkill = 1,
-    EvolutionSkill = 4,
-    UniqueSkill = 5,
-} SkillType;
-
-
-// Skill tree entry structure.
-typedef struct
-{
-    byte LevelUp <name = "Pending Levels">;
+// Skill structure.
+typedef struct {
+    byte LevelUp <name = "Lv Increase Required">;
     SkillType Type <name = "Skill Type">;
-    PQ2BattleSkill Skill <name = "Skill">;
-    short Unknown;
-} SkillData;
+    PQ2BattleSkill Skill;
+    short BlankSpace;
+} SkillData <read=EnumToString(Skill)>;
 
+// Skill block structure.
+typedef struct {
+    for (ubyte g = 0; g < 16; g++)
+    {SkillData Skill;}
+} Skills;
 
 // Main table structure.
-struct
-{
-    short Field00;
-    short Field04;
-    short Field08;
-    short Field0C;
-    SkillData SkillBlock [16] <name = "Skills">;
-} SubPersona [401] <name = "Sub Personas">;
+typedef struct (short i) {
+    local PersonaName Name = i;
+    byte HPGrowth;
+    byte SPGrowth;
+    byte StGrowth;
+    byte MaGrowth;
+    byte EnGrowth;
+    byte AgGrowth;
+    byte LuGrowth;
+    byte BlankSpace;
+    Skills PersonaSkills <name = "Skills">;
+} PersonaData <read=EnumToString(Name)>;
 
-// Sub-Persona entry number = Persona ID
+//Sub-Personas.
+struct {
+    for (short g = 0; g < 401; g++) {
+        PersonaData Persona(g);}
+} Personas;
