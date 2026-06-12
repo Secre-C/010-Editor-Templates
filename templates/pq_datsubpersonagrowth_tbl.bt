@@ -1,0 +1,60 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.3 Binary Template
+//
+//      File: datsubpersonagrowth.tbl
+//   Authors: Lumi Platinum, Century_
+//   Version: 1.0
+//   Purpose: Parsing PQ's datsubpersonagrowth.tbl
+//  Category: Persona Q
+// File Mask: *.tbl
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+//------------------------------------------------
+// Includes pq_enums.bt for skill and persona names.
+// Not sure exactly where else I should disclaim this,
+// but this file was derived from Century-300's
+// PQ2 versions of the same .bt and was developed
+// using info gained from aqiu384's resources.
+// Thanks to everyone involved who helped me indirectly!
+//------------------------------------------------
+#include "pq_enums.bt"
+
+// Skill structure.
+typedef struct {
+    byte Level <name = "Lv Increase Required">;
+    SkillType Type;
+    PQBattleSkill Skill;
+} SkillData <read=EnumToString(Skill)>;
+
+// Skill block structure (2 initial skills, up to 6 learned)
+typedef struct {
+    SkillData Skill <name = "Initial Skill">;
+    SkillData Skill <name = "Initial Skill">;
+    for (ubyte g = 0; g < 14; g++)
+    {SkillData Skill <name = "Learned Skill">;}
+} Skills;
+
+// Main table structure.
+// I am assuming that the other 32 bytes are slots for
+// 8 more skills, and that they are just never used.
+typedef struct (short i) {
+    local PersonaName Name = i;
+    byte HPGrowth;
+    byte SPGrowth;
+    byte StGrowth;
+    byte MaGrowth;
+    byte EnGrowth;
+    byte AgGrowth;
+    byte LuGrowth;
+    byte BlankSpace;
+    Skills PersonaSkills <name = "Skills">;
+} PersonaData <read=EnumToString(Name)>;
+
+//Sub-Personas.
+struct {
+    for (short g = 0; g < 288; g++) {
+    if (!(g<2||(g>189&&g<208)||g>211)) {PersonaData Persona(g);}
+    else {PersonaData Persona(g) <comment="unused">;}
+}} Personas;

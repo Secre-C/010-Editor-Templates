@@ -1,0 +1,46 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: DatBtlTheurgiaBoostDataAsset.uasset, DatBtlTheurgiaBoostBossDataAsset.uasset
+//   Authors: Light8227
+//   Version: 1.0
+//------------------------------------------------
+#include "ue4_iopackage.bt"
+
+LittleEndian();
+
+typedef struct
+{
+    byte unk[98] <name="Unknown">;
+}unk;
+
+typedef struct
+{
+    byte FProperty[13] <hidden=true>;
+    ushort value <name="Value">;
+    byte FProperty2[25] <hidden=true>;
+    ushort value2 <name="Value">;
+    byte FProperty3[25] <hidden=true>;
+    ushort value3 <name="Value">;
+    byte FProperty4[25] <hidden=true>;
+    ushort value4 <name="Value">;
+    byte FProperty5[25] <hidden=true>;
+    ushort value5 <name="Value">;
+    byte FProperty6[25] <hidden=true>;
+    ushort value6 <name="Value">;
+    byte FProperty7[25] <hidden=true>;
+    ushort value7 <name="Value">;
+    byte FProperty8[25] <hidden=true>;
+    ushort value8 <name="Value">;
+    byte FProperty9[25] <hidden=true>;
+    ushort value9 <name="Value">;
+    byte FProperty10[25] <hidden=true>;
+    ushort value10 <name="Value">;
+    byte FProperty11[20] <hidden=true>;
+}boostData[17];
+
+struct
+{
+    unk unknown <name="Unknown">;
+    boostData boostdata <name="BoostData">;
+}fileData <name="DatBtlTheurgiaBoostDataAsset.uasset">;

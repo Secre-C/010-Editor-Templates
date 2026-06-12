@@ -13,9 +13,191 @@
 
 #include "common/include.h"
 
+// TODO use these where applicable
+
+#define PNTBUFF_SIZE (0x60)
+#define VERT_OFS (0x00)
+#define NORM_OFS (0x10)
+#define COLOR_OFS (0x20)
+#define UV_OFS (0x30)
+#define NEXT_OFS (0x40)
+#define BASE0_OFS (0x44)
+#define BASE1_OFS (0x48)
+#define DIVRATE_OFS (0x4c)
+#define DIVRATE_Q_OFS (0x40)
+#define FACEDIVFLAG_OFS (0x50)
+#define CLIPFLAG_OFS (0x51)
+#define SCRATCH_POINT_BUFF_LIMIT (0x80)
+#define CORE_VU0_BLOCK_SIZE (0x10)
+#define CORE_VU0_BLOCK_SIZE_ASM ("16")
+#define SDF_COREVU0_CHUNK_POINT_MAX (24)
+#define SDF_VU0OFS_POINT_BUFF (0x60)
+#define SDF_VU0OFS_SKIN_MATRIX (0xC0)
+#define SDF_VU0OFS_VERTEX_MATRIX (220)
+#define SDF_VU0OFS_LIGHT_MATRIX (0xE0)
+#define SDF_VU0OFS_FACEDIV_PARM (227)
+#define SDF_VU0OFS_TEX_TM (230)
+
+#define SDF_MAT_PARMBIT_AMBIENT (1)
+#define SDF_MAT_PARMBIT_DIFFUSE (2)
+#define SDF_MAT_PARMBIT_TEXINDEX (4)
+#define SDF_MAT_PARMBIT_TEXTM (8)
+#define SDF_MAT_PARMBIT_MLTTEXCOL (0x10)
+#define SDF_MAT_PARMBIT_MLTTEXPARM (0x20)
+#define SDF_MAT_PARMBIT_MLTTEXTM (0x40)
+#define SDF_MAT_PARMBIT_SPECULAR (0x80)
+#define SDF_MAT_PARMBIT_REFMAP (0x100)
+#define SDF_MAT_PARMBIT_CONSTANT (0x200)
+#define SDF_MAT_PARMBIT_FACEDIVPARM (0x400)
+
+#define PACKET_TYPE_NORMAL (1)
+#define PACKET_TYPE_ONESKIN (2)
+#define PACKET_TYPE_SHAPED (3)
+#define PACKET_TYPE_COREDRAW_NORMAL (4)
+#define PACKET_TYPE_COREDRAW_ONESKIN (5)
+#define PACKET_TYPE_COREDRAW_SHAPED (6)
+#define PACKET_TYPE_COREVU0DRAW_ONESKIN (7)
+#define PACKET_TYPE_COREVU0DRAW_STD (8)
+
+#define MODEL_PACKET_HEADER_TYPE_NORMAL (1)
+#define MODEL_PACKET_HEADER_TYPE_SHAPE (2)
+#define MODEL_PACKET_HEADER_TYPE_COREDRAW (3)
+
+#define SDF_PACKETBIT_FACE (0x20)
+#define SDF_PACKETBIT_VERTEX (0x40)
+#define SDF_PACKETBIT_NORMAL (0x80)
+#define SDF_PACKETBIT_ST (0x100)
+#define SDF_PACKETBIT_VERTCOL (0x200)
+#define SDF_PACKETBIT_CLRBUFF (0x400)
+#define SDF_PACKETBIT_BLENDVERT (0x800)
+#define SDF_PACKETBIT_BLENDGRP (0x1000)
+#define SDF_PACKETBIT_NODRAW (0x2000)
+#define SDF_PACKETBIT_STRIP (0x4000)
+
+#define SDF_ATTRBIT_SPECULAR (1)
+#define SDF_ATTRBIT_REFMAP (2)
+#define SDF_ATTRBIT_LUSTERMAP (4)
+#define SDF_ATTRBIT_SMOOTHSHADING (8)
+#define SDF_ATTRBIT_TEXMAP (0x10)
+#define SDF_ATTRBIT_FOG (0x20)
+#define SDF_ATTRBIT_ALPHABLEND (0x40)
+#define SDF_ATTRBIT_ANTIALIAS (0x80)
+#define SDF_ATTRBIT_DIRECT_UV (0x100)
+#define SDF_ATTRBIT_CONTEXT (0x200)
+#define SDF_ATTRBIT_FIX (0x400)
+#define SDF_ATTRBIT_VERTCOL (0x800)
+#define SDF_ATTRBIT_MULTITEX (0x1000)
+#define SDF_ATTRBIT_SINGLESIDE (0x2000)
+#define SDF_ATTRBIT_DOUBLESIDE (0x4000)
+
+#define SDF_MODEL_OT_LENGTH (4)
+#define SDF_MORPH_TARGET_MAX (2)
+#define SDF_MODEL_NODE_FLAG_HIDE (1)
+#define SDF_MODEL_NODE_FLAG_LOCALCOLOR (2)
+#define SDF_MODEL_NODE_FLAG_MOTION_HIDE (16)
+#define SDF_MODEL_FLAG_COMPLEX_NODE_ID (1)
+#define SDF_MODEL_FLAG_SELF_FACEDIV_PARM (2)
+#define SDF_MODEL_FLAG_EARLY_SETUP (4)
+#define SDF_MODEL_FLAG_REVERSE_FACE (8)
+#define SDF_MODEL_FLAG_DREW (16)
+
+#define SDF_GEOMOBJ_FLAG_NORMAL (0x10000)
+#define SDF_GEOMOBJ_FLAG_REVERSE (0x20000)
+#define SDF_GEOMOBJ_FLAG_NO_CAP (0x40000)
+
+#define SDF_SHAPE_ELEM_VERTEX (1)
+#define SDF_SHAPE_ELEM_NORMAL (2)
+#define SDF_SHAPE_ELEM_UV (4)
+#define SDF_SHAPE_ELEM_UV_EXT (8)
+#define SDF_SHAPE_ELEM_VERTCOLOR (0x10)
+#define SDF_SHAPE_ELEM_FACE (0x20)
+#define SDF_SHAPE_ELEM_FACENORMAL (0x40)
+#define SDF_SHAPE_ELEM_FACECOLOR (0x80)
+#define SDF_SHAPE_ELEM_MASK (65535)
+#define SDF_SHAPE_FLAG_SPECULAR (0x10000)
+#define SDF_SHAPE_FLAG_FOG (0x20000)
+#define SDF_SHAPE_FLAG_DOUBLESIDE (0x40000)
+#define SDF_SHAPE_FLAG_FACEDIV (0x80000)
+#define SDF_SHAPE_UV_CHANNEL_MAX (2)
+
+enum<u32> FLD_RES
+{
+    FLD_RES_PORTAL = 0,
+    FLD_RES_BLOCK_RANGE = 1,
+    FLD_RES_DRAW_OBJ = 2,
+    FLD_RES_COL_OBJ = 3,
+    FLD_RES_CAMERA = 4,
+    FLD_RES_TEXLIST = 5,
+    FLD_RES_EVENT = 6,
+    FLD_RES_RENGE = 7,
+    FLD_RES_MATERIAL = 8,
+    FLD_RES_MOTION = 9,
+    FLD_RES_POSITION = 10,
+    FLD_RES_EFFECT = 11,
+    FLD_RES_LIGHT = 12,
+};
+
 BitfieldDisablePadding();
 
 local u32 gBaseOffset = 0;
+
+int DecodeRelocationTable(u8 relocationTable[], int relocationTableSize, int addressBaseOffset, int addressLocs[])
+{
+    local const byte ADDRESS_SIZE = sizeof(int);
+    local const byte SEQ_LOOP = 0xF8;
+    local const byte SEQ_BASE = 0x07;
+    local const byte SEQ_BASE_NUM_LOOP = 2;
+    local const byte SEQ_MAX_NUM_LOOP = 33;
+    
+    local int prevRelocSum = 0;
+    local int i;
+    local int loop;
+    local int numLoop;
+    local int j;
+    local int addressLocIndex = 0;
+    local byte reloc;
+    for (i = 0; i < relocationTableSize; i++)
+    {
+        reloc = relocationTable[i];
+
+        // Check if the value is odd
+        if ((reloc % 2) != 0)
+        {
+            // Check if the value indicates a sequence run of addresses
+            if ((reloc & SEQ_BASE) == SEQ_BASE)
+            {
+                // Get the encoded loop number
+                loop = (reloc & SEQ_LOOP) >> 3;
+
+                // Get the number of loops, base loop number is 2
+                numLoop = SEQ_BASE_NUM_LOOP + loop;
+                for (j = 0; j < numLoop; j++)
+                {
+                    addressLocs[addressLocIndex++]= (addressBaseOffset + prevRelocSum + ADDRESS_SIZE);
+                    prevRelocSum += ADDRESS_SIZE;
+                }
+
+                // Continue the loop early so we skip adding the reloc value to the list later on
+                continue;
+            }
+            // If value isn't a sequence run then read the next byte and bitwise OR it onto the value
+
+            // Decrement the reloc value to remove the extra bit added to make it an odd number
+            reloc -= 1;
+            reloc |= relocationTable[++i] << 8;
+        }
+        else
+        {
+            // If the value isn't odd, shift the value 1 bit to the left
+            reloc <<= 1;
+        }
+
+        addressLocs[addressLocIndex++]= (addressBaseOffset + prevRelocSum + reloc);
+        prevRelocSum += reloc;
+    }
+
+    return addressLocIndex;
+}
 
 typedef struct
 {
@@ -176,30 +358,8 @@ typedef struct
 } TTexture;
 
 // Model
-typedef struct( u32 hasHeader )
+typedef struct
 {
-    SetRandomBackColor();
-
-    if ( hasHeader )
-    {
-        u8 FileType;
-        u8 IsCompressed;
-        u16 UserId;
-        u32 FileSize;
-        u32 Magic;
-        u32 MemorySize;
-    }
-
-    u32 RelocationTableOffset;
-    u32 RelocationTableSize;
-    u32 Padding[2];
-    
-    // Hacky fix for field models
-    if ( hasHeader ) 
-    {
-        gBaseOffset = FTell();
-    }
-
     u32 NodesOffset;
     u32 MaterialsOffset;
     u32 MorpherMeshCount;
@@ -285,6 +445,33 @@ typedef struct( u32 hasHeader )
             }
         } Extensions;
     }
+} sdfModelDef_t;
+
+typedef struct( u32 hasHeader )
+{
+    SetRandomBackColor();
+
+    if ( hasHeader )
+    {
+        u8 FileType;
+        u8 IsCompressed;
+        u16 UserId;
+        u32 FileSize;
+        u32 Magic;
+        u32 MemorySize;
+    }
+
+    u32 RelocationTableOffset;
+    u32 RelocationTableSize;
+    u32 Padding[2];
+    
+    // Hacky fix for field models
+    if ( hasHeader ) 
+    {
+        gBaseOffset = FTell();
+    }
+
+    sdfModelDef_t modelDef;
 
     if ( RelocationTableOffset != 0 )
     {
@@ -292,16 +479,20 @@ typedef struct( u32 hasHeader )
         SetRandomBackColor();
         FSeek( gBaseOffset + RelocationTableOffset );
         u8 RelocationTable[ RelocationTableSize ];
+        local int DecodedAddressLocations[1000];
+        local int DecodedAddressLocationCount = DecodeRelocationTable(RelocationTable, RelocationTableSize, gBaseOffset, DecodedAddressLocations);
     }
 
 } TModel;
 
+// sdfModelNodeDef_t
 typedef struct 
 {
     SetRandomBackColor();
-    u32 Field00; // not 0 in hansya01.MB
-    u32 Field04; Assert( Field04 == 0, "Node Field04 isnt 0" );
-    s32 Index;
+    u16 Format;
+    u16 Pad0;
+    u32 Pad1;
+    s32 Id;
     s32 ParentIndex;
     TVector4 Rotation;
     TVector4 Position;
@@ -388,12 +579,14 @@ typedef struct
 
                 switch ( MeshType )
                 {
-                    case 1: struct TMeshType1 Mesh; break;
-                    case 2: struct TMeshType2 Mesh; break;
-                    case 4: struct TMeshType4 Mesh; break;
-                    case 5: struct TMeshType5 Mesh; break;
-                    case 7: struct TMeshType7 Mesh; break;
-                    case 8: struct TMeshType8 Mesh; break;
+                    case PACKET_TYPE_NORMAL: struct TMeshType1 Mesh; break;
+                    case PACKET_TYPE_ONESKIN: struct TMeshType2 Mesh; break;
+                    case PACKET_TYPE_SHAPED: Assert(false && "Unhandled mesh type"); break;
+                    case PACKET_TYPE_COREDRAW_NORMAL: struct TMeshType4 Mesh; break;
+                    case PACKET_TYPE_COREDRAW_ONESKIN: struct TMeshType5 Mesh; break;
+                    case PACKET_TYPE_SHAPED: Assert(false && "Unhandled mesh type"); break;
+                    case PACKET_TYPE_COREVU0DRAW_ONESKIN: struct TMeshType7 Mesh; break;
+                    case PACKET_TYPE_COREVU0DRAW_STD: struct TMeshType8 Mesh; break;
                     default: Printf( "Unhandled mesh type: %d\n", MeshType ); break;
                 }
             }
@@ -1063,10 +1256,12 @@ typedef struct
         SetRandomBackColor();
         FSeek( gBaseOffset + DataSize );
         u8 RelocationTable[ RelocationTableSize ];
+        local int DecodedAddressLocations[1000];
+        local int DecodedAddressLocationCount = DecodeRelocationTable(RelocationTable, RelocationTableSize, gBaseOffset, DecodedAddressLocations);
     }
 } TMotionPack;
 
-enum<u16> TControllerType
+enum<u32> TControllerType
 {
     TControllerType_Translation = 0,
     TControllerType_Scale = 2,
@@ -1080,13 +1275,9 @@ typedef struct
 {
     SetRandomBackColor();
     TControllerType Type;
-    u16 Field02;
-    u16 NodeIndex;
-    u16 Field06;
+    u32 NodeIndex;
 
     if ( EnumToString( Type ) == "" ) Printf( "TController: unknown type: %d\n", Type ); 
-    if ( Field02 != 0 ) Printf( "TController: %s %d Field02 is not 0: %d\n", EnumToString( Type ), NodeIndex, Field02 ); 
-    if ( Field06 != 0 ) Printf( "TController: %s %d Field06 is not 0: %d\n", EnumToString( Type ), NodeIndex, Field06 ); 
 } TController <optimize=false>;
 
 // A motion represents the entire array of per-node tracks containing modifications of properties over time
@@ -1233,6 +1424,34 @@ typedef struct( u32 controllerIndex )
                             break;
                     }
                     break;
+                    
+                case 0x10004:
+                    switch ( KeyFrameSize )
+                    {
+                        case 4:
+                            u32 Value;
+                            break;
+                        default:
+                            Assert( false );
+                            break;
+                    }
+                    break;
+                    
+                case 0x20000:
+                    switch ( KeyFrameSize )
+                    {
+                        case 8:
+                            f32 Values[2];
+                            break;
+                        default:
+                            Assert( false );
+                            break;
+                    }
+                    break;
+                    
+                default:
+                    Assert( false );
+                    break;
             }
         } KeyFrameValues;
     }
@@ -1293,6 +1512,8 @@ typedef struct
         FSeek( gBaseOffset + RelocationTableOffset );
         SetRandomBackColor();
         u8 RelocationTable[ RelocationTableSize ];
+        local int DecodedAddressLocations[1000];
+        local int DecodedAddressLocationCount = DecodeRelocationTable(RelocationTable, RelocationTableSize, gBaseOffset, DecodedAddressLocations);
     }
 
     if ( ResourceListOffset != 0 )
@@ -1328,7 +1549,7 @@ typedef struct
 typedef struct
 {
     SetRandomBackColor();
-    u32 Type;
+    FLD_RES Type;
     u32 Count;
     u32 Offset;
     local u32 next = FTell();
@@ -1346,7 +1567,7 @@ typedef struct
 {
     SetRandomBackColor();
     u32 Id;
-    u32 Type;
+    FLD_RES Type;
     TStringOffset Name( gBaseOffset );
     u32 Field0C;
     u32 TransformOffset;
@@ -1482,7 +1703,7 @@ typedef struct
                     s32 Field1C;
                     s16 Field20;
                     s16 Field22;
-                } Field10Data[ Field04 ];
+                } Field10Data[ Field04 ] <optimize=true>;
             }
 
             if ( Field14 != 0 )
@@ -1546,6 +1767,7 @@ typedef struct
 
 
 // Read file
+#ifndef HEADLESS
 struct
 {
     local u32 chunkStart;
@@ -1603,3 +1825,4 @@ struct
         }
     }
 } File;
+#endif

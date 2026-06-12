@@ -1,0 +1,59 @@
+FSeek( 0x10 );
+
+LittleEndian();
+DisplayFormatHex();
+
+typedef struct { float X; float Y; float Z; } Vec3f;
+typedef struct { float X; float Y; float Z; float W; } Vec4f;
+
+typedef struct {
+  ushort  Flags<comment="Rotation Locks can be enabled here">; // 0001 - enabled
+  ushort  AnimationID<format=decimal>;
+  
+  ushort  Field04;
+  ushort  Field06;
+  ushort  Field08;
+  ushort  Field0A;
+  
+  Vec3f View;
+  Vec3f Rot;
+
+  uint  Field24; // 0
+  uint  Field28; // 0
+
+  float MaxRotationLeft;
+  float MaxRotationRight;
+
+  float Scale;
+
+  Vec4f Light;
+
+  uint  LightRGBA;
+
+  local int ID<hidden=true>;
+  local int BlockID<hidden=true>;
+  ID = count_;
+  BlockID = count_;
+  SetBackColor( ( ID % 2 ) * 0x440000 + 0x880000 );
+  count_ += 1;
+} PDD <size=0x4c,optimize=false>;
+
+SetBackColor( 0x880000 );
+
+local int count_ = 0;
+
+typedef struct {
+
+  PDD pdd[210]<read=Str("Enemy ID %03d - block %03d", 141 + this.ID, this.BlockID) >;
+
+  int numOfBlocks;
+  int R_unk1;
+  int R_unk2;
+  int R_unk3;
+
+  PDD pddR[numOfBlocks]<read=Str("Enemy ID %03d - block %03d", 254 + this.ID, this.BlockID) >;
+} PDDFile;
+
+PDDFile File;
+
+Printf("");

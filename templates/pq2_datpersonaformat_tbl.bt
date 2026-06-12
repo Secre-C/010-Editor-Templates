@@ -1,18 +1,19 @@
 //------------------------------------------------
-//--- 010 Editor v9.0.2 Binary Template
+//--- 010 Editor v16.0.3 Binary Template
 //
-//      File: 
-//   Authors: Century_
+//      File: datpersonaformat.tbl
+//   Authors: Century_, Lumi Platinum
 //   Version: 1.0
 //   Purpose: Parsing PQ2's datpersonaformat.tbl
-//  Category: Table
+//  Category: Persona Q2
 // File Mask: *.tbl
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 
-
-// Includes pq2_enums.bt for arcana names.
+//------------------------------------------------
+// Includes pq2_enums.bt for arcana and persona names.
+//------------------------------------------------
 #include "pq2_enums.bt"
 
 typedef enum<short>
@@ -23,62 +24,56 @@ typedef enum<short>
     Weak = 120,
 } Affinity;
 
-// First bitflag byte affinity values:
-// Null = 0
-// Resist = 32
-// Neutral = 64
-// Weak = 78
+typedef enum<short> {
+    None = 0,
+    Debug_Only = 16,
+    Ultimate = 128, //speculative
+    Special_Fusion = 128+4,
+    Main = 128+32+1,
+    Cut_Unused = 128+32+16+4,
+    DLC = 512+128,
+} InternalType;
 
 // Elemental Affinity block structure.
-typedef struct
-{
-    Affinity Phys <name = "Physical">;
-    Affinity Fire <name = "Fire">;
-    Affinity Ice <name = "Ice">;
-    Affinity Electric <name = "Electric">;
-    Affinity Wind <name = "Wind">;
-    Affinity Psy <name = "Psy">;
-    Affinity Nuke <name = "Nuke">;
-    Affinity Bless <name = "Bless">;
-    Affinity Curse <name = "Curse">;
-}AffinityBitflags <name = "Elemental Affinities">;
-
+typedef struct {
+    Affinity Phys;
+    Affinity Fire;
+    Affinity Ice;
+    Affinity Elec;
+    Affinity Wind;
+    Affinity Psy;
+    Affinity Nuke;
+    Affinity Bless;
+    Affinity Curse;
+}AffinityValues <name = "Elemental Affinities">;
 
 // Unknown Affinity block structure.
-typedef struct
-{
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-    Affinity Unknown;
-}UnknownBitflags <name = "Unknown Affinities">;
+typedef struct {
+    for (byte g = 0; g < 16; g++)
+    {Affinity Unknown;}
+}UnknownValues <name = "Unknown Affinities">;
 
 // Main table structure.
-struct
-{
-    short Field00;
+typedef struct (short i) {
+    local PersonaName Name = i;
+    InternalType Type;
     Arcana ID <name = "Arcana ID">;
-    byte BaseLevel <name = "Base Level">;
-    short HP_Bonus <name = "HP Bonus">;
-    short SP_Bonus <name = "SP Bonus">;
-    short Field14;
-    short Field18;
-    short Field1C;
-    short Field20;
-    short Field24;
-    AffinityBitflags Elements;
-    UnknownBitflags Unknown;
-    short UnknownArray [42];
-} Entries [401] <name = "Persona Entries">;
+    ubyte BaseLevel <name = "Base Level">;
+    short HPBonus <name = "HP Bonus">;
+    short SPBonus <name = "SP Bonus">;
+    short St;
+    short Ma;
+    short En;
+    short Ag;
+    short Lu;
+    AffinityValues Elements;
+    UnknownValues Unknown;
+    ubyte UnknownArray [8]; //this still needs to be figured out
+    short EmptyArray [38];
+} PersonaData <read=EnumToString(Name), optimize = true>;
+
+//Personas.
+struct {
+    for (short g = 0; g < 401; g++) {
+        PersonaData Persona(g);}
+} Personas;

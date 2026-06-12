@@ -1,44 +1,63 @@
 //------------------------------------------------
-//--- 010 Editor v9.0.2 Binary Template
+//--- 010 Editor v16.0.3 Binary Template
 //
-//      File: 
-//   Authors: Century_
+//      File: datmainpersonagrowth.tbl
+//   Authors: Century_, Lumi Platinum
 //   Version: 1.0
 //   Purpose: Parsing PQ2's datmainpersonagrowth.tbl
-//  Category: Table
+//  Category: Persona Q2
 // File Mask: *.tbl
 //  ID Bytes: 
 //   History: 
 //------------------------------------------------
 
-//---------------------------------------------
-// Includes
-//---------------------------------------------
-
-//Includes pq2_enums.bt for skill names.
+//------------------------------------------------
+// Includes pq2_enums.bt for skill, persona, and user names.
+//------------------------------------------------
 #include "pq2_enums.bt"
 
-typedef enum<byte>
-{
-    LearnableSkill = 1,
-    EvolutionSkill = 4,
-    UniqueSkill = 5,
-} SkillType;
-
-// Skill tree entry structure.
-typedef struct 
-{
+// Skill structure.
+typedef struct  {
     byte Level <name = "Level Learned">;
-    SkillType Type <name = "Type">;
-    PQ2BattleSkill Skill <name = "Skill">;
+    SkillType Type;
+    PQ2BattleSkill Skill;
     short Unknown; 
-} SkillData;
+} SkillData <read=EnumToString(Skill)>;
+
+//Skill block structure.
+typedef struct {
+    for (ubyte g = 0; g < 32; g++)
+    {SkillData Skill;}
+} Skills;
+
+//Stat increase block structure
+typedef struct {
+    for (ubyte g = 1; g < 100; g++) {
+    struct {
+        local string Level = "Lv " + Str("%d", g);
+        local string Comment = 
+        "Stat increases from reaching " + Level;
+        int HPGrowth;
+        int SPGrowth;
+        int StGrowth;
+        int MaGrowth;
+        int EnGrowth;
+        int AgGrowth;
+        int LuGrowth;
+    } LevelUpStats <name=Level, comment=Comment>;
+}} StatIncreases;
 
 // Main table structure.
-struct 
-{
-    short Character <name = "Character">;
+typedef struct (short i) {
+    local PersonaName Name = i;
+    PersonaUser User;
     short Levels <name = "Levels Available">;
-    SkillData SkillBlock [32] <name = "Persona Skills">;
-    int UnknownBlock [693];
-} MainPersonaEntries[56] <name = "Main Persona">;
+    Skills SkillBlock <name = "Persona Skills">;
+    StatIncreases StatBlock <name = "Level Up Stats">;
+} PersonaData <read=EnumToString(Name)>;
+
+//Main Personas.
+struct {
+    for (short g = 240; g < 296; g++) {
+        PersonaData Persona(g);}
+} Personas;
