@@ -26,7 +26,6 @@ int FlagConvert( int flag )
 
 typedef struct
 {
-	float unk0[2];
 	float PlayerIconX1;
 	float PlayerIconY1;
 	float unk1[8];
@@ -63,6 +62,7 @@ typedef struct
 	ubyte MainSpd2Unused;
 	ubyte KanjiSpdId;
 	ubyte LableSpdId;
+	float unk0[2];
 }lmapParams<read=Str("SPD IDs: Main -> %03d; Kanji -> %03d; Label -> %03d", MainSpdId, KanjiSpdId, LableSpdId)>;
 
 typedef struct

@@ -63,101 +63,92 @@ void WriteQuaternion( Quaternion& value, string s )
     SScanf( s, "[%f, %f, %f, %f]", value.X, value.Y, value.Z, value.W );
 }
 
+typedef struct
+{
+	u32 bit00 : 1;
+	u32 bit01 : 1;
+	u32 bit02 : 1;
+	u32 bit03 : 1;
+	u32 bit04 : 1;
+	u32 bit05 : 1;
+	u32 bit06 : 1;
+	u32 bit07 : 1;
+	u32 bit08 : 1;
+	u32 bit09 : 1;
+	u32 bit10 : 1;
+	u32 bit11 : 1;
+	u32 bit12 : 1;
+	u32 bit13 : 1;
+	u32 bit14 : 1;
+	u32 bit15 : 1;
+	u32 UseEmbeddedScript : 1; // Embedded flags take take priority over path flags
+	u32 UseScriptFromPath : 1;
+	u32 UseEmbeddedBmd : 1;
+	u32 UseBmdFromPath : 1;
+	u32 bit20 : 1;
+	u32 bit21 : 1;
+	u32 bit22 : 1;
+	u32 bit23 : 1;
+	u32 bit24 : 1;
+	u32 bit25 : 1;
+	u32 bit26 : 1;
+	u32 bit27 : 1;
+	u32 bit28 : 1;
+	u32 bit29 : 1;
+	u32 bit30 : 1;
+	u32 bit31 : 1;
+}EvtHeaderFlags;
+
 // Evt file structure
 typedef struct
 {
     SetRandomBackColor();
-
-    char Magic[3];      
-    byte endianess;	// 'EVT\x01'
-    u32 Version<format=hex>;            // always 0x0002722E, possibly a version as modifying it breaks things
-    u16 MajorId;                        // might be unused metadata
-    u16 MinorId;                        // might be unused metadata
-    u8 Field0C;                         // unknown, doesn't have an apparent effect
-    u8 Field0D;                         // unknown, doesn't have an apparent effect
-    u16 Field0E;                        // always 0?
-    u32 FileSize;                       // size of the entire file
-    u32 Field14;                        // offset, always 0x90
-    u8 Field18;                         // always 0? changing has no apparent effect
-    u8 Field19;                         // 0, 1, etc, maybe a count? setting this to 0 doesn't have an apparent effect
-    u8 Field1A;                         // 0, 1, 3, etc
-    u8 Field1B;                         // 0x12, 0x02, 0x00, 0x01, etc. maybe a count? setting this to 0 breaks the event, but nonzero doesn't
-    u32 Duration;                       // determines the duration of the event
-    u8 Field20;                         // always 30, doesn' have an apparent effect
-    u8 Field21;                         // always 0, maybe u16?
-    u16 Field22;
-    u32 Field24;                        // maybe a count
-    u32 Field28;                        // if set to 0, env params don't get applied. maybe a bool?
-    u32 Field2C;                        // maybe a count
-    u32 ObjectCount;                    // number of objects to be loaded
-    u32 ObjectOffset;                   // array offset
-    u32 ObjectSize;                     // array entry size, always 0x30
-    u32 Field3C;                        // 0?
-    u32 CommandCount;                   // number of event commands
-    u32 CommandOffset;                  // array offset
-    u32 CommandSize;                    // entry size, always 0x30
-    u32 Field4C;                        // 0?
-    u32 Field50;                        // 0?
-    u32 Field54;                        // 0?
-    u32 Field58;                        // 0?
-    u32 Field5C;                        // 0?
-    u32 Field60;                        // 0?
-    u32 Field64;                        // 0?
-    u32 Field68;                        // 0?
-    u32 Field6C;                        // 0?
-    s32 Field70;                        // often 0xFFFFFFFF
-    s32 Field74;                        // often 0xFFFFFFFF
-    s32 Field78;                        // often 0xFFFFFFFF
-    s32 Field7C;                        // often 0xFFFFFFFF
-    s32 Field80;                        // often 0xFFFFFFFF
-    s32 Field84;                        // often 0xFFFFFFFF
-    s32 Field88;                        // often 0xFFFFFFFF
-    s32 Field8C;                        // often 0xFFFFFFFF
-	if ( Version == 0x29B9C ) // LE, used by Royal
+	char MagicCode[3];
+    byte EndianType;
+    u32 Version<format=hex>;
+    u16 MajorID;
+    u16 MinorID;
+    byte Rank;
+    byte Level;
+    u16 Reserve_1_4;
+    u32 FileSize;
+    u32 FileHeaderSize;
+    EvtHeaderFlags Flags;
+    s32 TotalFrame;
+    byte FrameRate;
+    byte InitScriptIndex;
+    u16 StartFrame;
+    u16 LetterBoxInFrame;
+    u16 Reserve_3_2;
+    u32 InitEnvAssetID;
+    u32 InitEnvAssetIDDbg;
+    u32 ObjectCount;
+    u32 AssetDataOfs;
+    u32 AssetDataSize;
+    u32 AssetReserve;
+    u32 CommandCount;
+    u32 CommandOffset;
+    u32 CommandHeaderSize;
+    u32 CommandReserve;
+    u32 MessagePathOfs;
+    u32 MessagePathSize;
+    u32 MessageFileOfs;
+    u32 MessageFileSize;
+    u32 ScriptPathOfs;
+    u32 ScriptPathSize;
+    u32 ScriptFileOfs;
+    u32 ScriptFileSize;
+	
+	if ( Version == 0x29B9C )
 	{
-		s32 Field90;                        // often 0xFFFFFFFF
-		s32 Field94;                        // often 0xFFFFFFFF
-		s32 Field98;                        // often 0xFFFFFFFF
-		s32 Field9C;                        // often 0xFFFFFFFF
-		s32 FieldA0;                        // often 0xFFFFFFFF
-		s32 FieldA4;                        // often 0xFFFFFFFF
-		s32 FieldA8;                        // often 0xFFFFFFFF
-		s32 FieldAC;                        // often 0xFFFFFFFF
-		s32 FieldB0;                        // often 0xFFFFFFFF
-		s32 FieldB4;                        // often 0xFFFFFFFF
-		s32 FieldB8;                        // often 0xFFFFFFFF
-		s32 FieldBC;                        // often 0xFFFFFFFF
-		s32 FieldC0;                        // often 0xFFFFFFFF
-		s32 FieldC4;                        // often 0xFFFFFFFF
-		s32 FieldC8;                        // often 0xFFFFFFFF
-		s32 FieldCC;                        // often 0xFFFFFFFF
-		s32 FieldD0;                        // often 0xFFFFFFFF
-		s32 FieldD4;                        // often 0xFFFFFFFF
-		s32 FieldD8;                        // often 0xFFFFFFFF
-		s32 FieldDC;                        // often 0xFFFFFFFF
-		s32 FieldE0;                        // often 0xFFFFFFFF
-		s32 FieldE4;                        // often 0xFFFFFFFF
-		s32 FieldE8;                        // often 0xFFFFFFFF
-		s32 FieldEC;                        // often 0xFFFFFFFF
-		s32 FieldF0;                        // often 0xFFFFFFFF
-		s32 FieldF4;                        // often 0xFFFFFFFF
-		s32 FieldF8;                        // often 0xFFFFFFFF
-		s32 FieldFC;                        // often 0xFFFFFFFF
-		s32 Field100;                       // often 0xFFFFFFFF
-		s32 Field104;                       // often 0xFFFFFFFF
-		s32 Field108;                       // often 0xFFFFFFFF
-		s32 Field10C;                       // often 0xFFFFFFFF
-		s32 Field110;                       // often 0xFFFFFFFF
-		s32 Field114;                       // often 0xFFFFFFFF
-		s32 Field118;                       // often 0xFFFFFFFF
-		s32 Field11C;                       // often 0xFFFFFFFF
-		s32 Field120;                       // often 0xFFFFFFFF
-		s32 Field124;                       // often 0xFFFFFFFF
-		s32 Field128;                       // often 0xFFFFFFFF
-		s32 Field12C;                       // often 0xFFFFFFFF
-	} 
+		s32 MarkerFrame[48];
+	}
+	else
+	{
+		s32 MarkerFrame[8];
+	}
 
-    FSeek( ObjectOffset );
+    FSeek( AssetDataOfs );
     struct Object Objects[ ObjectCount ];
 
     FSeek( CommandOffset );
