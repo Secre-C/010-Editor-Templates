@@ -1,0 +1,899 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: p5r_gsc.bt
+//   Authors: Rirurin
+//   Version: v0.1.0
+//   Purpose: Persona 5 Royal GFD Shader Cache Template
+// File Mask: *.gsc
+//  ID Bytes: GFS0
+//   History:   v0.2.0 (2023/02/22) Defined SVSV Chunk fields, template now runs on Switch shader cache (not reading into compiled Maxwell shader code though!)
+//              v0.1.0 (2022/12/03) Mapped basic layout of GSC and partial support for DX11 Bytecode
+//------------------------------------------------
+
+#include "common/include.h"
+#include "p5_gfd_enums.bt"
+#include "p5_gfd_enum_functions.bt"
+
+BigEndian();
+
+typedef struct
+{
+    char Signature[4];
+    u32 Version <format=hex>;
+    EFileType Type;
+    u32 Reserved;
+    Assert( Reserved == 0 );
+} TFileHeader <read=TFileHeaderToString>;
+
+string TFileHeaderToString( TFileHeader& value )
+{
+    string buffer;
+    SPrintf( buffer, "%s, ver 0x%08X, type %d", value.Signature, value.Version, value.Type );
+    return buffer;
+}
+
+// DIRECTX 11 TYPES
+
+// https://learn.microsoft.com/en-us/windows/win32/api/d3dcommon/ne-d3dcommon-d3d_shader_variable_class
+
+typedef enum<u16> _D3D_SHADER_VARIABLE_CLASS {
+  D3D_SVC_SCALAR = 0,
+  D3D_SVC_VECTOR,
+  D3D_SVC_MATRIX_ROWS,
+  D3D_SVC_MATRIX_COLUMNS,
+  D3D_SVC_OBJECT,
+  D3D_SVC_STRUCT,
+  D3D_SVC_INTERFACE_CLASS,
+  D3D_SVC_INTERFACE_POINTER,
+  D3D10_SVC_SCALAR,
+  D3D10_SVC_VECTOR,
+  D3D10_SVC_MATRIX_ROWS,
+  D3D10_SVC_MATRIX_COLUMNS,
+  D3D10_SVC_OBJECT,
+  D3D10_SVC_STRUCT,
+  D3D11_SVC_INTERFACE_CLASS,
+  D3D11_SVC_INTERFACE_POINTER,
+  D3D_SVC_FORCE_DWORD = 0x7fffffff
+} D3D_SHADER_VARIABLE_CLASS;
+
+// https://learn.microsoft.com/en-us/windows/win32/api/d3dcommon/ne-d3dcommon-d3d_shader_variable_type
+
+typedef enum<u16> _D3D_SHADER_VARIABLE_TYPE {
+  D3D_SVT_VOID = 0,
+  D3D_SVT_BOOL = 1,
+  D3D_SVT_INT = 2,
+  D3D_SVT_FLOAT = 3,
+  D3D_SVT_STRING = 4,
+  D3D_SVT_TEXTURE = 5,
+  D3D_SVT_TEXTURE1D = 6,
+  D3D_SVT_TEXTURE2D = 7,
+  D3D_SVT_TEXTURE3D = 8,
+  D3D_SVT_TEXTURECUBE = 9,
+  D3D_SVT_SAMPLER = 10,
+  D3D_SVT_SAMPLER1D = 11,
+  D3D_SVT_SAMPLER2D = 12,
+  D3D_SVT_SAMPLER3D = 13,
+  D3D_SVT_SAMPLERCUBE = 14,
+  D3D_SVT_PIXELSHADER = 15,
+  D3D_SVT_VERTEXSHADER = 16,
+  D3D_SVT_PIXELFRAGMENT = 17,
+  D3D_SVT_VERTEXFRAGMENT = 18,
+  D3D_SVT_UINT = 19,
+  D3D_SVT_UINT8 = 20,
+  D3D_SVT_GEOMETRYSHADER = 21,
+  D3D_SVT_RASTERIZER = 22,
+  D3D_SVT_DEPTHSTENCIL = 23,
+  D3D_SVT_BLEND = 24,
+  D3D_SVT_BUFFER = 25,
+  D3D_SVT_CBUFFER = 26,
+  D3D_SVT_TBUFFER = 27,
+  D3D_SVT_TEXTURE1DARRAY = 28,
+  D3D_SVT_TEXTURE2DARRAY = 29,
+  D3D_SVT_RENDERTARGETVIEW = 30,
+  D3D_SVT_DEPTHSTENCILVIEW = 31,
+  D3D_SVT_TEXTURE2DMS = 32,
+  D3D_SVT_TEXTURE2DMSARRAY = 33,
+  D3D_SVT_TEXTURECUBEARRAY = 34,
+  D3D_SVT_HULLSHADER = 35,
+  D3D_SVT_DOMAINSHADER = 36,
+  D3D_SVT_INTERFACE_POINTER = 37,
+  D3D_SVT_COMPUTESHADER = 38,
+  D3D_SVT_DOUBLE = 39,
+  D3D_SVT_RWTEXTURE1D = 40,
+  D3D_SVT_RWTEXTURE1DARRAY = 41,
+  D3D_SVT_RWTEXTURE2D = 42,
+  D3D_SVT_RWTEXTURE2DARRAY = 43,
+  D3D_SVT_RWTEXTURE3D = 44,
+  D3D_SVT_RWBUFFER = 45,
+  D3D_SVT_BYTEADDRESS_BUFFER = 46,
+  D3D_SVT_RWBYTEADDRESS_BUFFER = 47,
+  D3D_SVT_STRUCTURED_BUFFER = 48,
+  D3D_SVT_RWSTRUCTURED_BUFFER = 49,
+  D3D_SVT_APPEND_STRUCTURED_BUFFER = 50,
+  D3D_SVT_CONSUME_STRUCTURED_BUFFER = 51,
+  D3D_SVT_MIN8FLOAT = 52,
+  D3D_SVT_MIN10FLOAT = 53,
+  D3D_SVT_MIN16FLOAT = 54,
+  D3D_SVT_MIN12INT = 55,
+  D3D_SVT_MIN16INT = 56,
+  D3D_SVT_MIN16UINT = 57,
+  D3D_SVT_INT16,
+  D3D_SVT_UINT16,
+  D3D_SVT_FLOAT16,
+  D3D_SVT_INT64,
+  D3D_SVT_UINT64,
+  D3D10_SVT_VOID,
+  D3D10_SVT_BOOL,
+  D3D10_SVT_INT,
+  D3D10_SVT_FLOAT,
+  D3D10_SVT_STRING,
+  D3D10_SVT_TEXTURE,
+  D3D10_SVT_TEXTURE1D,
+  D3D10_SVT_TEXTURE2D,
+  D3D10_SVT_TEXTURE3D,
+  D3D10_SVT_TEXTURECUBE,
+  D3D10_SVT_SAMPLER,
+  D3D10_SVT_SAMPLER1D,
+  D3D10_SVT_SAMPLER2D,
+  D3D10_SVT_SAMPLER3D,
+  D3D10_SVT_SAMPLERCUBE,
+  D3D10_SVT_PIXELSHADER,
+  D3D10_SVT_VERTEXSHADER,
+  D3D10_SVT_PIXELFRAGMENT,
+  D3D10_SVT_VERTEXFRAGMENT,
+  D3D10_SVT_UINT,
+  D3D10_SVT_UINT8,
+  D3D10_SVT_GEOMETRYSHADER,
+  D3D10_SVT_RASTERIZER,
+  D3D10_SVT_DEPTHSTENCIL,
+  D3D10_SVT_BLEND,
+  D3D10_SVT_BUFFER,
+  D3D10_SVT_CBUFFER,
+  D3D10_SVT_TBUFFER,
+  D3D10_SVT_TEXTURE1DARRAY,
+  D3D10_SVT_TEXTURE2DARRAY,
+  D3D10_SVT_RENDERTARGETVIEW,
+  D3D10_SVT_DEPTHSTENCILVIEW,
+  D3D10_SVT_TEXTURE2DMS,
+  D3D10_SVT_TEXTURE2DMSARRAY,
+  D3D10_SVT_TEXTURECUBEARRAY,
+  D3D11_SVT_HULLSHADER,
+  D3D11_SVT_DOMAINSHADER,
+  D3D11_SVT_INTERFACE_POINTER,
+  D3D11_SVT_COMPUTESHADER,
+  D3D11_SVT_DOUBLE,
+  D3D11_SVT_RWTEXTURE1D,
+  D3D11_SVT_RWTEXTURE1DARRAY,
+  D3D11_SVT_RWTEXTURE2D,
+  D3D11_SVT_RWTEXTURE2DARRAY,
+  D3D11_SVT_RWTEXTURE3D,
+  D3D11_SVT_RWBUFFER,
+  D3D11_SVT_BYTEADDRESS_BUFFER,
+  D3D11_SVT_RWBYTEADDRESS_BUFFER,
+  D3D11_SVT_STRUCTURED_BUFFER,
+  D3D11_SVT_RWSTRUCTURED_BUFFER,
+  D3D11_SVT_APPEND_STRUCTURED_BUFFER,
+  D3D11_SVT_CONSUME_STRUCTURED_BUFFER,
+  D3D_SVT_FORCE_DWORD = 0x7fffffff
+} D3D_SHADER_VARIABLE_TYPE;
+
+typedef enum<u16>  {
+    D3D10_SB_OPCODE_ADD          ,
+    D3D10_SB_OPCODE_AND          ,
+    D3D10_SB_OPCODE_BREAK        ,
+    D3D10_SB_OPCODE_BREAKC       ,
+    D3D10_SB_OPCODE_CALL         ,
+    D3D10_SB_OPCODE_CALLC        ,
+    D3D10_SB_OPCODE_CASE         ,
+    D3D10_SB_OPCODE_CONTINUE     ,
+    D3D10_SB_OPCODE_CONTINUEC    ,
+    D3D10_SB_OPCODE_CUT          ,
+    D3D10_SB_OPCODE_DEFAULT      ,
+    D3D10_SB_OPCODE_DERIV_RTX    ,
+    D3D10_SB_OPCODE_DERIV_RTY    ,
+    D3D10_SB_OPCODE_DISCARD      ,
+    D3D10_SB_OPCODE_DIV          ,
+    D3D10_SB_OPCODE_DP2          ,
+    D3D10_SB_OPCODE_DP3          ,
+    D3D10_SB_OPCODE_DP4          ,
+    D3D10_SB_OPCODE_ELSE         ,
+    D3D10_SB_OPCODE_EMIT         ,
+    D3D10_SB_OPCODE_EMITTHENCUT  ,
+    D3D10_SB_OPCODE_ENDIF        ,
+    D3D10_SB_OPCODE_ENDLOOP      ,
+    D3D10_SB_OPCODE_ENDSWITCH    ,
+    D3D10_SB_OPCODE_EQ           ,
+    D3D10_SB_OPCODE_EXP          ,
+    D3D10_SB_OPCODE_FRC          ,
+    D3D10_SB_OPCODE_FTOI         ,
+    D3D10_SB_OPCODE_FTOU         ,
+    D3D10_SB_OPCODE_GE           ,
+    D3D10_SB_OPCODE_IADD         ,
+    D3D10_SB_OPCODE_IF           ,
+    D3D10_SB_OPCODE_IEQ          ,
+    D3D10_SB_OPCODE_IGE          ,
+    D3D10_SB_OPCODE_ILT          ,
+    D3D10_SB_OPCODE_IMAD         ,
+    D3D10_SB_OPCODE_IMAX         ,
+    D3D10_SB_OPCODE_IMIN         ,
+    D3D10_SB_OPCODE_IMUL         ,
+    D3D10_SB_OPCODE_INE          ,
+    D3D10_SB_OPCODE_INEG         ,
+    D3D10_SB_OPCODE_ISHL         ,
+    D3D10_SB_OPCODE_ISHR         ,
+    D3D10_SB_OPCODE_ITOF         ,
+    D3D10_SB_OPCODE_LABEL        ,
+    D3D10_SB_OPCODE_LD           ,
+    D3D10_SB_OPCODE_LD_MS        ,
+    D3D10_SB_OPCODE_LOG          ,
+    D3D10_SB_OPCODE_LOOP         ,
+    D3D10_SB_OPCODE_LT           ,
+    D3D10_SB_OPCODE_MAD          ,
+    D3D10_SB_OPCODE_MIN          ,
+    D3D10_SB_OPCODE_MAX          ,
+    D3D10_SB_OPCODE_CUSTOMDATA   ,
+    D3D10_SB_OPCODE_MOV          ,
+    D3D10_SB_OPCODE_MOVC         ,
+    D3D10_SB_OPCODE_MUL          ,
+    D3D10_SB_OPCODE_NE           ,
+    D3D10_SB_OPCODE_NOP          ,
+    D3D10_SB_OPCODE_NOT          ,
+    D3D10_SB_OPCODE_OR           ,
+    D3D10_SB_OPCODE_RESINFO      ,
+    D3D10_SB_OPCODE_RET          ,
+    D3D10_SB_OPCODE_RETC         ,
+    D3D10_SB_OPCODE_ROUND_NE     ,
+    D3D10_SB_OPCODE_ROUND_NI     ,
+    D3D10_SB_OPCODE_ROUND_PI     ,
+    D3D10_SB_OPCODE_ROUND_Z      ,
+    D3D10_SB_OPCODE_RSQ          ,
+    D3D10_SB_OPCODE_SAMPLE       ,
+    D3D10_SB_OPCODE_SAMPLE_C     ,
+    D3D10_SB_OPCODE_SAMPLE_C_LZ  ,
+    D3D10_SB_OPCODE_SAMPLE_L     ,
+    D3D10_SB_OPCODE_SAMPLE_D     ,
+    D3D10_SB_OPCODE_SAMPLE_B     ,
+    D3D10_SB_OPCODE_SQRT         ,
+    D3D10_SB_OPCODE_SWITCH       ,
+    D3D10_SB_OPCODE_SINCOS       ,
+    D3D10_SB_OPCODE_UDIV         ,
+    D3D10_SB_OPCODE_ULT          ,
+    D3D10_SB_OPCODE_UGE          ,
+    D3D10_SB_OPCODE_UMUL         ,
+    D3D10_SB_OPCODE_UMAD         ,
+    D3D10_SB_OPCODE_UMAX         ,
+    D3D10_SB_OPCODE_UMIN         ,
+    D3D10_SB_OPCODE_USHR         ,
+    D3D10_SB_OPCODE_UTOF         ,
+    D3D10_SB_OPCODE_XOR          ,
+    D3D10_SB_OPCODE_DCL_RESOURCE                     , // DCL* opcodes have
+    D3D10_SB_OPCODE_DCL_CONSTANT_BUFFER              , // custom operand formats.
+    D3D10_SB_OPCODE_DCL_SAMPLER                      ,
+    D3D10_SB_OPCODE_DCL_INDEX_RANGE                  ,
+    D3D10_SB_OPCODE_DCL_GS_OUTPUT_PRIMITIVE_TOPOLOGY ,
+    D3D10_SB_OPCODE_DCL_GS_INPUT_PRIMITIVE           ,
+    D3D10_SB_OPCODE_DCL_MAX_OUTPUT_VERTEX_COUNT      ,
+    D3D10_SB_OPCODE_DCL_INPUT                        ,
+    D3D10_SB_OPCODE_DCL_INPUT_SGV                    ,
+    D3D10_SB_OPCODE_DCL_INPUT_SIV                    ,
+    D3D10_SB_OPCODE_DCL_INPUT_PS                     ,
+    D3D10_SB_OPCODE_DCL_INPUT_PS_SGV                 ,
+    D3D10_SB_OPCODE_DCL_INPUT_PS_SIV                 ,
+    D3D10_SB_OPCODE_DCL_OUTPUT                       ,
+    D3D10_SB_OPCODE_DCL_OUTPUT_SGV                   ,
+    D3D10_SB_OPCODE_DCL_OUTPUT_SIV                   ,
+    D3D10_SB_OPCODE_DCL_TEMPS                        ,
+    D3D10_SB_OPCODE_DCL_INDEXABLE_TEMP               ,
+    D3D10_SB_OPCODE_DCL_GLOBAL_FLAGS                 ,
+
+// -----------------------------------------------
+
+    D3D10_SB_OPCODE_RESERVED0,
+    
+// ---------- DX 10.1 op codes---------------------
+
+    D3D10_1_SB_OPCODE_LOD,
+    D3D10_1_SB_OPCODE_GATHER4,
+    D3D10_1_SB_OPCODE_SAMPLE_POS,
+    D3D10_1_SB_OPCODE_SAMPLE_INFO,
+
+// -----------------------------------------------
+
+    // This should be 10.1's version of D3D10_SB_NUM_OPCODES
+    D3D10_1_SB_OPCODE_RESERVED1,
+
+// ---------- DX 11 op codes---------------------
+    D3D11_SB_OPCODE_HS_DECLS                         , // token marks beginning of HS sub-shader
+    D3D11_SB_OPCODE_HS_CONTROL_POINT_PHASE           , // token marks beginning of HS sub-shader
+    D3D11_SB_OPCODE_HS_FORK_PHASE                    , // token marks beginning of HS sub-shader
+    D3D11_SB_OPCODE_HS_JOIN_PHASE                    , // token marks beginning of HS sub-shader
+
+    D3D11_SB_OPCODE_EMIT_STREAM                      ,
+    D3D11_SB_OPCODE_CUT_STREAM                       ,
+    D3D11_SB_OPCODE_EMITTHENCUT_STREAM               ,
+    D3D11_SB_OPCODE_INTERFACE_CALL                   ,
+
+    D3D11_SB_OPCODE_BUFINFO                          ,
+    D3D11_SB_OPCODE_DERIV_RTX_COARSE                 ,
+    D3D11_SB_OPCODE_DERIV_RTX_FINE                   ,
+    D3D11_SB_OPCODE_DERIV_RTY_COARSE                 ,
+    D3D11_SB_OPCODE_DERIV_RTY_FINE                   ,
+    D3D11_SB_OPCODE_GATHER4_C                        ,
+    D3D11_SB_OPCODE_GATHER4_PO                       ,
+    D3D11_SB_OPCODE_GATHER4_PO_C                     ,
+    D3D11_SB_OPCODE_RCP                              ,
+    D3D11_SB_OPCODE_F32TOF16                         ,
+    D3D11_SB_OPCODE_F16TOF32                         ,
+    D3D11_SB_OPCODE_UADDC                            ,
+    D3D11_SB_OPCODE_USUBB                            ,
+    D3D11_SB_OPCODE_COUNTBITS                        ,
+    D3D11_SB_OPCODE_FIRSTBIT_HI                      ,
+    D3D11_SB_OPCODE_FIRSTBIT_LO                      ,
+    D3D11_SB_OPCODE_FIRSTBIT_SHI                     ,
+    D3D11_SB_OPCODE_UBFE                             ,
+    D3D11_SB_OPCODE_IBFE                             ,
+    D3D11_SB_OPCODE_BFI                              ,
+    D3D11_SB_OPCODE_BFREV                            ,
+    D3D11_SB_OPCODE_SWAPC                            ,
+
+    D3D11_SB_OPCODE_DCL_STREAM                       ,
+    D3D11_SB_OPCODE_DCL_FUNCTION_BODY                ,
+    D3D11_SB_OPCODE_DCL_FUNCTION_TABLE               ,
+    D3D11_SB_OPCODE_DCL_INTERFACE                    ,
+    
+    D3D11_SB_OPCODE_DCL_INPUT_CONTROL_POINT_COUNT    ,
+    D3D11_SB_OPCODE_DCL_OUTPUT_CONTROL_POINT_COUNT   ,
+    D3D11_SB_OPCODE_DCL_TESS_DOMAIN                  ,
+    D3D11_SB_OPCODE_DCL_TESS_PARTITIONING            ,
+    D3D11_SB_OPCODE_DCL_TESS_OUTPUT_PRIMITIVE        ,
+    D3D11_SB_OPCODE_DCL_HS_MAX_TESSFACTOR            ,
+    D3D11_SB_OPCODE_DCL_HS_FORK_PHASE_INSTANCE_COUNT ,
+    D3D11_SB_OPCODE_DCL_HS_JOIN_PHASE_INSTANCE_COUNT ,
+
+    D3D11_SB_OPCODE_DCL_THREAD_GROUP                 ,
+    D3D11_SB_OPCODE_DCL_UNORDERED_ACCESS_VIEW_TYPED  ,
+    D3D11_SB_OPCODE_DCL_UNORDERED_ACCESS_VIEW_RAW    ,
+    D3D11_SB_OPCODE_DCL_UNORDERED_ACCESS_VIEW_STRUCTURED,
+    D3D11_SB_OPCODE_DCL_THREAD_GROUP_SHARED_MEMORY_RAW,
+    D3D11_SB_OPCODE_DCL_THREAD_GROUP_SHARED_MEMORY_STRUCTURED,
+    D3D11_SB_OPCODE_DCL_RESOURCE_RAW                 ,
+    D3D11_SB_OPCODE_DCL_RESOURCE_STRUCTURED          ,
+    D3D11_SB_OPCODE_LD_UAV_TYPED                     ,
+    D3D11_SB_OPCODE_STORE_UAV_TYPED                  ,
+    D3D11_SB_OPCODE_LD_RAW                           ,
+    D3D11_SB_OPCODE_STORE_RAW                        ,
+    D3D11_SB_OPCODE_LD_STRUCTURED                    ,
+    D3D11_SB_OPCODE_STORE_STRUCTURED                 ,
+    D3D11_SB_OPCODE_ATOMIC_AND                       ,
+    D3D11_SB_OPCODE_ATOMIC_OR                        ,
+    D3D11_SB_OPCODE_ATOMIC_XOR                       ,
+    D3D11_SB_OPCODE_ATOMIC_CMP_STORE                 ,
+    D3D11_SB_OPCODE_ATOMIC_IADD                      ,
+    D3D11_SB_OPCODE_ATOMIC_IMAX                      ,
+    D3D11_SB_OPCODE_ATOMIC_IMIN                      ,
+    D3D11_SB_OPCODE_ATOMIC_UMAX                      ,
+    D3D11_SB_OPCODE_ATOMIC_UMIN                      ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_ALLOC                 ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_CONSUME               ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_IADD                  ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_AND                   ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_OR                    ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_XOR                   ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_EXCH                  ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_CMP_EXCH              ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_IMAX                  ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_IMIN                  ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_UMAX                  ,
+    D3D11_SB_OPCODE_IMM_ATOMIC_UMIN                  ,   
+    D3D11_SB_OPCODE_SYNC                             ,
+    
+    D3D11_SB_OPCODE_DADD                             ,
+    D3D11_SB_OPCODE_DMAX                             ,
+    D3D11_SB_OPCODE_DMIN                             ,
+    D3D11_SB_OPCODE_DMUL                             ,
+    D3D11_SB_OPCODE_DEQ                              ,
+    D3D11_SB_OPCODE_DGE                              ,
+    D3D11_SB_OPCODE_DLT                              ,
+    D3D11_SB_OPCODE_DNE                              ,
+    D3D11_SB_OPCODE_DMOV                             ,
+    D3D11_SB_OPCODE_DMOVC                            ,
+    D3D11_SB_OPCODE_DTOF                             ,
+    D3D11_SB_OPCODE_FTOD                             ,
+
+    D3D11_SB_OPCODE_EVAL_SNAPPED                     ,
+    D3D11_SB_OPCODE_EVAL_SAMPLE_INDEX                ,
+    D3D11_SB_OPCODE_EVAL_CENTROID                    ,
+    
+    D3D11_SB_OPCODE_DCL_GS_INSTANCE_COUNT            ,
+
+    D3D10_SB_NUM_OPCODES                                     // Should be the last entry
+} D3D10_SB_OPCODE_TYPE<optimize=true>;
+
+typedef enum<u8>
+{
+    D3D10_SB_OPERAND_0_COMPONENT = 0,
+    D3D10_SB_OPERAND_1_COMPONENT = 1,
+    D3D10_SB_OPERAND_4_COMPONENT = 2,
+    D3D10_SB_OPERAND_N_COMPONENT = 3 // unused for now
+} D3D10_SB_OPERAND_NUM_COMPONENTS;
+
+typedef enum<u8>
+{
+    D3D10_SB_OPERAND_TYPE_TEMP           = 0,  // Temporary Register File
+    D3D10_SB_OPERAND_TYPE_INPUT          = 1,  // General Input Register File
+    D3D10_SB_OPERAND_TYPE_OUTPUT         = 2,  // General Output Register File
+    D3D10_SB_OPERAND_TYPE_INDEXABLE_TEMP = 3,  // Temporary Register File (indexable)
+    D3D10_SB_OPERAND_TYPE_IMMEDIATE32    = 4,  // 32bit/component immediate value(s)
+                                          // If for example, operand token bits
+                                          // [01:00]==D3D10_SB_OPERAND_4_COMPONENT,
+                                          // this means that the operand type:
+                                          // D3D10_SB_OPERAND_TYPE_IMMEDIATE32
+                                          // results in 4 additional 32bit
+                                          // DWORDS present for the operand.
+    D3D10_SB_OPERAND_TYPE_IMMEDIATE64    = 5,  // 64bit/comp.imm.val(s)HI:LO
+    D3D10_SB_OPERAND_TYPE_SAMPLER        = 6,  // Reference to sampler state
+    D3D10_SB_OPERAND_TYPE_RESOURCE       = 7,  // Reference to memory resource (e.g. texture)
+    D3D10_SB_OPERAND_TYPE_CONSTANT_BUFFER= 8,  // Reference to constant buffer
+    D3D10_SB_OPERAND_TYPE_IMMEDIATE_CONSTANT_BUFFER= 9,  // Reference to immediate constant buffer
+    D3D10_SB_OPERAND_TYPE_LABEL          = 10, // Label
+    D3D10_SB_OPERAND_TYPE_INPUT_PRIMITIVEID = 11, // Input primitive ID
+    D3D10_SB_OPERAND_TYPE_OUTPUT_DEPTH   = 12, // Output Depth
+    D3D10_SB_OPERAND_TYPE_NULL           = 13, // Null register, used to discard results of operations
+                                               // Below Are operands new in DX 10.1
+    D3D10_SB_OPERAND_TYPE_RASTERIZER     = 14, // DX10.1 Rasterizer register, used to denote the depth/stencil and render target resources
+    D3D10_SB_OPERAND_TYPE_OUTPUT_COVERAGE_MASK = 15, // DX10.1 PS output MSAA coverage mask (scalar)
+                                               // Below Are operands new in DX 11
+    D3D11_SB_OPERAND_TYPE_STREAM         = 16, // Reference to GS stream output resource
+    D3D11_SB_OPERAND_TYPE_FUNCTION_BODY  = 17, // Reference to a function definition
+    D3D11_SB_OPERAND_TYPE_FUNCTION_TABLE = 18, // Reference to a set of functions used by a class
+    D3D11_SB_OPERAND_TYPE_INTERFACE      = 19, // Reference to an interface
+    D3D11_SB_OPERAND_TYPE_FUNCTION_INPUT = 20, // Reference to an input parameter to a function
+    D3D11_SB_OPERAND_TYPE_FUNCTION_OUTPUT = 21, // Reference to an output parameter to a function
+    D3D11_SB_OPERAND_TYPE_OUTPUT_CONTROL_POINT_ID = 22, // HS Control Point phase input saying which output control point ID this is
+    D3D11_SB_OPERAND_TYPE_INPUT_FORK_INSTANCE_ID = 23, // HS Fork Phase input instance ID
+    D3D11_SB_OPERAND_TYPE_INPUT_JOIN_INSTANCE_ID = 24, // HS Join Phase input instance ID
+    D3D11_SB_OPERAND_TYPE_INPUT_CONTROL_POINT = 25, // HS Fork+Join, DS phase input control points (array of them)
+    D3D11_SB_OPERAND_TYPE_OUTPUT_CONTROL_POINT = 26, // HS Fork+Join phase output control points (array of them)
+    D3D11_SB_OPERAND_TYPE_INPUT_PATCH_CONSTANT = 27, // DS+HSJoin Input Patch Constants (array of them)
+    D3D11_SB_OPERAND_TYPE_INPUT_DOMAIN_POINT = 28, // DS Input Domain point
+    D3D11_SB_OPERAND_TYPE_THIS_POINTER       = 29, // Reference to an interface this pointer
+    D3D11_SB_OPERAND_TYPE_UNORDERED_ACCESS_VIEW = 30, // Reference to UAV u#
+    D3D11_SB_OPERAND_TYPE_THREAD_GROUP_SHARED_MEMORY = 31, // Reference to Thread Group Shared Memory g#
+    D3D11_SB_OPERAND_TYPE_INPUT_THREAD_ID = 32, // Compute Shader Thread ID
+    D3D11_SB_OPERAND_TYPE_INPUT_THREAD_GROUP_ID = 33, // Compute Shader Thread Group ID
+    D3D11_SB_OPERAND_TYPE_INPUT_THREAD_ID_IN_GROUP = 34, // Compute Shader Thread ID In Thread Group
+    D3D11_SB_OPERAND_TYPE_INPUT_COVERAGE_MASK = 35, // Pixel shader coverage mask input
+    D3D11_SB_OPERAND_TYPE_INPUT_THREAD_ID_IN_GROUP_FLATTENED = 36, // Compute Shader Thread ID In Group Flattened to a 1D value.
+    D3D11_SB_OPERAND_TYPE_INPUT_GS_INSTANCE_ID = 37, // Input GS instance ID
+    D3D11_SB_OPERAND_TYPE_OUTPUT_DEPTH_GREATER_EQUAL = 38, // Output Depth, forced to be greater than or equal than current depth
+    D3D11_SB_OPERAND_TYPE_OUTPUT_DEPTH_LESS_EQUAL    = 39, // Output Depth, forced to be less than or equal to current depth
+    D3D11_SB_OPERAND_TYPE_CYCLE_COUNTER = 40, // Cycle counter
+} D3D10_SB_OPERAND_TYPE;
+
+typedef enum<u8>
+{
+    D3D10_SB_OPERAND_INDEX_0D = 0, // e.g. Position
+    D3D10_SB_OPERAND_INDEX_1D = 1, // Most common.  e.g. Temp registers.
+    D3D10_SB_OPERAND_INDEX_2D = 2, // e.g. Geometry Program Input registers.
+    D3D10_SB_OPERAND_INDEX_3D = 3, // 3D rarely if ever used.
+} D3D10_SB_OPERAND_INDEX_DIMENSION;
+
+typedef enum<u8>
+{
+    D3D10_SB_OPERAND_4_COMPONENT_MASK_MODE    = 0,  // mask 4 components
+    D3D10_SB_OPERAND_4_COMPONENT_SWIZZLE_MODE = 1,  // swizzle 4 components
+    D3D10_SB_OPERAND_4_COMPONENT_SELECT_1_MODE = 2, // select 1 of 4 components
+} D3D10_SB_OPERAND_4_COMPONENT_SELECTION_MODE;
+
+// http://timjones.io/blog/archive/2015/09/02/parsing-direct3d-shader-bytecode
+// https://github.com/tgjones/slimshader/blob/master/src/SlimShader/Chunks/Rdef/ResourceDefinitionChunk.cs
+
+typedef struct {
+    char signature[4];
+    Assert(signature == "RD11", Str("[P5R_GSC] Incorrect RD11 header in RDEF chunk"));
+    u32 Field04; // always 60
+    u32 Field08; // always 24
+    u32 Field0C; // always 32
+    u32 Field10; // always 40
+    u32 Field14; // always 36
+    u32 Field18; // always 12
+    u32 InterfaceSlotCount;
+} RDEFRD11<read=Str("RD11 Chunk (SM5)")>;
+
+typedef struct {
+    u32 chunkLength;
+    u32 bufferCount;
+    u32 offsetToConstBuffer; // from beginning of chunk to first constant buffer
+    u32 resourceBindCount;
+    u32 offsetToResrcBindDesc; // from start of chunk to first resource binding description
+    u8 minorVersion;
+    u8 majorVersion;
+    u16 programType<format=hex>;
+    u32 Flags;
+    u32 offsetToCreator; // start of chunk to "creator"
+} RDEFHeader<size=32, read=Str("v%d.%d, %d buffers, %d resource binds", majorVersion, minorVersion, bufferCount, resourceBindCount)>;
+
+typedef struct(u32 chunkStart) {
+    local u32 start = chunkStart;
+    u32 offsetToBufferName;
+    u32 variableCount;
+    u32 offsetTo1stVariableDesc;
+    u32 Flags2;
+    u32 constBufferType;
+} RDEFConstBuffer<read = GetRDEFConstBufferName, optimize=false>;
+
+typedef struct(u32 chunkStart) {
+    local u32 start = chunkStart;
+    u32 offsetToVariableName;
+    u32 offsetFromStartOfConstBuffer;
+    u32 variableSize;
+    u32 offsetToDefaultValue;
+    u32 offsetToVariableType;
+    u32 Field18;
+    u32 Field1C;
+    u32 Field20;
+    u32 Field24;
+    u32 Field28;
+} RDEFVariableDescription<read = GetRDEFVariableName, size=40>;
+
+typedef struct {
+    D3D_SHADER_VARIABLE_CLASS variableClass;
+    D3D_SHADER_VARIABLE_TYPE variableType;
+    u16 matrixRows;
+    u16 matrixColumns;
+    u16 arrayElements;
+    u16 structMembers;
+    u16 byteOffsetTo1stMember;
+} RDEFVariableType<optimize=false, read=Str("%s, %s, [%d x %d]", EnumToString(variableClass), EnumToString(variableType), matrixRows, matrixColumns)>;
+
+typedef struct(u32 chunkStart) {
+    local u32 start = chunkStart;
+    u32 offsetToResrcBindName;
+    u32 shaderInputType;
+    u32 ResourceReturnType;
+    u32 ResourceViewDimension;
+    u32 NumOfSamples;
+    u32 BindPoint;
+    u32 BindCount;
+    u32 ShaderInputFlags;
+    Printf("Slot %d\t %s\n", BindPoint, ReadString(start + offsetToResrcBindName));
+} RDEFResourceBind<optimize=false, read = GetRDEFResourceBindName>;
+
+string GetRDEFConstBufferName(RDEFConstBuffer& constBuffer) {
+    string name;
+    name = ReadString(constBuffer.start + constBuffer.offsetToBufferName);
+    return name;
+}
+
+string GetRDEFResourceBindName(RDEFResourceBind& resrcBind) {
+    string name;
+    //name = ReadString(resrcBind.start + resrcBind.offsetToResrcBindName);
+    SPrintf(name, "%s, Slot %d", ReadString(resrcBind.start + resrcBind.offsetToResrcBindName), resrcBind.BindPoint);
+    return name;
+}
+
+string GetRDEFVariableName(RDEFVariableDescription& varDesc) {
+    string buffer;
+    SPrintf(buffer, "%s", ReadString(varDesc.start + varDesc.offsetToVariableName));
+    return buffer;
+}
+
+typedef struct {
+    // RDEF Header
+    local u32 chunkStart = FTell() + 4;
+    RDEFHeader header;
+    if (header.majorVersion >= 5) { // RD11
+        RDEFRD11 RD11Chunk;
+    }
+    local int j;
+    local int i;
+    local u32 varDescPos;
+    for (j = 0; j < header.bufferCount; j++) {
+        // constant buffer
+        FSeek(chunkStart + header.offsetToConstBuffer + (j * 24));
+        RDEFConstBuffer constBuffer(chunkStart);
+        FSeek(chunkStart + constBuffer.offsetTo1stVariableDesc);
+        for (i = 0; i < constBuffer.variableCount; i++) {
+            // variable description
+            RDEFVariableDescription variableDesc(chunkStart);
+            varDescPos = FTell();
+            FSeek(chunkStart + variableDesc.offsetToVariableType);
+            // variable type
+            RDEFVariableType variableType;
+            FSeek(varDescPos);
+        }
+    }
+    // resource bind description
+    local int k;
+    for (k = 0; k < header.resourceBindCount; k++) {
+        FSeek(chunkStart + header.offsetToResrcBindDesc + (k * 0x20));
+        RDEFResourceBind resourceBind(chunkStart);
+    }
+    // creator
+    FSeek(chunkStart + header.offsetToCreator);
+    string creator;
+} RDEFChunk<optimize=false>;
+
+typedef struct(u32 chunkStart) {
+    local u32 start = chunkStart;
+    u32 offsetToElementName;
+    u32 semanticIndex;
+    u32 SysvalueType;
+    u32 ComponentType;
+    u32 Register;
+    u8 Mask;
+    u8 RWMask;
+    local u32 currPos = FTell();
+    FSeek(Align(currPos, 4));
+    
+} ISGNElement<optimize=false, read=GetISGNElementName>;
+
+string GetISGNElementName(ISGNElement& ISGN) {
+    string buffer;
+    SPrintf( buffer, "%s, register %d", ReadString(ISGN.start + ISGN.offsetToElementName), ISGN.Register);
+    return buffer;
+}
+
+
+typedef struct {
+    u32 chunkLength;
+    local u32 chunkStart = FTell();
+    u32 elementCount;
+    u32 Field0C;
+    // Element Data
+    ISGNElement elements(chunkStart)[elementCount];
+    FSeek(chunkStart + chunkLength);
+} ISGNChunk;
+
+typedef struct {
+    u8 minorVersion : 4;
+    u8 majorVersion : 4;
+} SHDRVersionNumber<read=Str("%d.%d", majorVersion, minorVersion)>;
+
+typedef struct {
+    BitfieldDisablePadding();
+    D3D10_SB_OPCODE_TYPE OpcodeType : 11;
+    u16 : 13;
+    u8 length : 7;
+    bool isOpcodeExtended : 1;
+} SHDROpcodeToken0;
+
+typedef struct {
+    SHDROpcodeToken0 opCodeHeader;
+    if (opCodeHeader.length > 1) {
+        u32 opCodeContents[opCodeHeader.length - 1];
+    }
+} SHDRChunkOpcode<read=Str("%s", EnumToString(opCodeHeader.OpcodeType))>;
+
+// VERY WIP
+typedef struct {
+    u32 chunkLength;
+    local u32 chunkStart = FTell();
+    SHDRVersionNumber version;
+    u8 padding<hidden=true>;
+    u16 programType;
+    u32 dwordCount;
+    
+    local u32 currDwordCount;
+    while (currDwordCount < dwordCount - 2) {
+        SHDRChunkOpcode opcode;
+        currDwordCount += (1 + opcode.opCodeHeader.length - 1);
+    }
+    FSeek(chunkStart + chunkLength);
+    //u32 shaderCode[dwordCount - 2];
+} SHDRChunk<optimize=false>;
+
+typedef struct {
+    u32 chunkLength;
+    u32 Stats[37];
+} STATChunk;
+
+typedef struct {
+    SetRandomBackColor();
+    char chunkHeader[4];
+    switch (chunkHeader) {
+        case "RDEF": // Resource Definition
+            RDEFChunk RDEF;
+            break;
+        case "ISGN": // ISGN - Input Signature
+        case "OSGN": // OSGN - Output Signature
+            ISGNChunk ISGN;
+            break;
+        case "SHEX": // SHEX - SM5 Shader
+            SHDRChunk Shader;
+            break;
+        case "STAT": // STAT - Statistics
+            STATChunk STAT;
+            break;
+        default:
+            Assert(false, Str("[P5R_GSC] Unknown DirectX Bytecode Chunk Header Type %x", chunkHeader));
+            break;
+    
+    }
+    FSeek(Align( FTell(), 4));
+} DXBCChunk<optimize=false, read=chunkHeader>;
+
+
+typedef struct {
+    LittleEndian();
+    char Signature[4]; // DXBC
+    u32 Checksum[4];
+    u32 Field14;
+    u32 ShaderSize;
+    u32 ChunkCount;
+    u32 ChunkIndex[ChunkCount];
+    DXBCChunk Chunk[ChunkCount];
+    BigEndian();
+} DXBCShaderContainer;
+
+typedef struct {
+    u8 Data[80];
+} TegraShaderProgramHeader;
+
+typedef struct {
+    enum<u32> {
+        PixelPermutation = 0,
+        VertexPermutation = 1,
+    } PermutationType;
+    string name;
+    FSeek(Align( FTell(), 4));
+} HNSHV002Permutation<optimize=false, read=Str("%s, %s", EnumToString(PermutationType), name)>;
+
+typedef struct {
+    u32 AllBlocksSize;
+    u32 BlockSize0;
+    DXBCShaderContainer FullShader;
+    u32 BlockSize1;
+    DXBCShaderContainer InputSignature;
+    if (BlockSize0 + BlockSize1 + 16 < AllBlocksSize) {
+        u32 BlockSize2;
+        u8 ShaderNames[BlockSize2 - 8];
+    }
+    u32 EndOfChunk;
+} HNSHV002ShaderBlockDX11Impl<optimize=false>;
+
+typedef struct {
+    u32 AllBlocksSize;
+    u32 BlockSize0;
+    FSkip(BlockSize0);
+    u32 BlockSize1;
+    FSkip(BlockSize1);
+    if (BlockSize0 + BlockSize1 + 16 < AllBlocksSize) {
+        u32 BlockSize2;
+        FSkip(BlockSize2 - 8);
+    }
+    u32 EndOfChunk;
+} HNSHV002ShaderBlockDefaultImpl<optimize=false>;
+
+// partially based on https://github.com/Radfordhound/HedgeLib/blob/5e3cb21adb6efdfa097b625c8417eaaacd45fcfc/HedgeLib/src/shader/hl_hh_shader.cpp
+
+typedef struct {
+    char Signature[8]; // HNSHNV002
+    local u32 chunkStart = FTell();
+    u32 ChunkSize;
+    u32 Field08;
+    u32 PermutationCount;
+    HNSHV002Permutation permutationCount[PermutationCount];
+    u32 Field10;
+    //u32 Field14;
+    u32 unk1[1 << PermutationCount];
+    while (FTell() < chunkStart + ChunkSize) {
+        switch (platform) {
+            case DX11: {
+                if (!fastLoad) HNSHV002ShaderBlockDX11Impl shaderData;
+                else HNSHV002ShaderBlockDefaultImpl shaderData;
+                break;
+            }
+            //case Tegra: HNSHV002ShaderBlockMaxwellImpl shaderData; break;
+            default: HNSHV002ShaderBlockDefaultImpl shaderData; break;
+        }
+    }
+    /*
+    while (FTell() < chunkStart2 + AllBlocksSize) {
+    //while (FTell() < chunkStart + AllBlocksSize) {
+        u32 BlockSize;
+        switch (platform) {
+            case DX11: DXBCShaderContainer Shader; break;
+            case Tegra: FSkip(BlockSize); break;
+            default: Assert(false, Str("[P5R_GSC] Unknown shader platform %d)", platform));
+        }
+        blockSizeVerify += BlockSize;
+    }*/
+    //Assert(blockSizeVerify + 16 == AllBlocksSize, Str("[P5R_GSC] Shader block list size does not match listed size (%d when shader list was %d)", AllBlocksSize, blockSizeVerify));
+    //Assert(blockSizeVerify == AllBlocksSize, Str("[P5R_GSC] Shader block list size does not match listed size (%d when shader list was %d)", AllBlocksSize, blockSizeVerify));
+    //u32 EndOfChunk;
+} HNSHV002Chunk<size = (8 + ReadUInt(startof(this) + 8))>; // optimized struct, faster read time
+//} HNSHV002Chunk<optimize=false>; // a lot slower, for debugging
+
+typedef struct {
+    char Signature[8]; // HHNEEDLE
+    u32 BlockSize;
+    string shaderCompileLogFile;
+    //u8 Field4;
+    FSeek(Align( FTell(), 4));
+    SetRandomBackColor();
+    HNSHV002Chunk HNSHV002;
+} HHNEEDLEChunk;
+
+// FUN_14026a230
+typedef struct {
+    char Signature[4]; // SVSV
+    //u16 ShaderType; // loads differently if set to 0 vs 1 (SVSV uses 0, __SP uses 1)
+    enum<u16> {
+        Vertex = 0,
+        Pixel = 1,
+    } ShaderType;
+    u32 InsideChunkSize;
+    EShaderType shaderType;
+    ShaderFlags shaderFlags;
+    TMaterialMapsTexcoord texcoordFlag1;
+    TMaterialMapsTexcoord texcoordFlag2;
+    //if (Field04 == 0) {
+    if (InsideChunkSize > 0) {
+        SetRandomBackColor();
+        HHNEEDLEChunk HHNEEDLE;
+        Assert( InsideChunkSize == sizeof(HHNEEDLE), Str("[P5R_GSC] Internal Chunk did not match size reported in external chunk (%d, %d)", InsideChunkSize, sizeof(HHNEEDLE)));
+    } else {
+        /*
+        SetRandomBackColor();
+        HHNEEDLEChunk HHNEEDLE;
+        */
+    }
+//} SVSVChunk<size = (ReadUInt(startof(this) + 6) + 36)>; // optimized struct, faster read time
+} SVSVChunk<optimize=false, read=SVSVEntrySummary>; // for debugging
+
+string SVSVEntrySummary(SVSVChunk& chunk) {
+    string out;
+    SPrintf(out, "%s_%x_%x_%x_%x_%x_%x_%x_%x", 
+        EnumToString(chunk.shaderType), chunk.ShaderType, chunk.shaderType,
+        chunk.shaderFlags.FLAG0, chunk.shaderFlags.FLAG1, chunk.shaderFlags.FLAG2, chunk.shaderFlags.FLAG3, 
+        showMaterialTexcoord2(chunk.texcoordFlag1), showMaterialTexcoord2(chunk.texcoordFlag2)
+    );
+    return out;
+}
+
+typedef enum<u32> {
+    DX11 = 7,
+    Tegra = 8,
+} GSCShaderType;
+
+local string filePath = GetFileName();
+local string fileName = FileNameGetBase(filePath, false);
+local string fileExt = FileNameGetExtension(filePath);
+local GSCShaderType platform = DX11;
+local bool fastLoad = false;
+
+if (Stricmp(fileExt, ".GSC") == 0 ) {
+    SetRandomBackColor();
+    TFileHeader GFSFileHeader;
+    SetRandomBackColor();
+    TFileHeader GSCFileHeader;
+    platform = GSCFileHeader.Type;
+    switch (platform) {
+        case DX11: Printf("DirectX 11 shaders\n"); break;
+        case Tegra: Printf("Tegra shaders\n"); break;
+        default: Assert(false, Str("[P5R_GSC] Unknown shader platform %d)", platform));
+    }
+    local u32 chunkHeader;
+    local u32 chunkCount = 0;
+    while (!FEof()) {
+        chunkHeader = ReadInt(FTell());
+        SetRandomBackColor();
+        switch (chunkHeader) {
+            case 0x53565356:
+                SVSVChunk SVSV;
+                break;
+            case 0x5f5f5350:
+                SVSVChunk SP;
+                break;
+            default:
+                Assert(false, Str("[P5R_GSC] Unknown SVSV Chunk Header Type %x", chunkHeader));
+                break;
+        }
+        chunkCount++;
+    }
+    Printf("%d chunks\n", chunkCount);
+} else {
+    Assert(false, Str("[P5R_GSC] Incorrect File Extension %s\n", fileExt));
+}

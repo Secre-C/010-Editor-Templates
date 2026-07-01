@@ -1,0 +1,174 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: *.vpo, *.fpo
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef struct
+{
+    BitfieldRightToLeft();
+    uint FLAG0_HDR               : 1; 
+    uint FLAG0_IMMEDIATE         : 1; 
+    uint FLAG0_SKINNING          : 1; 
+    uint FLAG0_BIT3              : 1; //eboot has no entry for this bit
+    uint FLAG0_LIGHT0_DIRECTION  : 1; 
+    uint FLAG0_LIGHT0_POINT      : 1; 
+    uint FLAG0_LIGHT0_SPOT       : 1; 
+    uint FLAG0_LIGHT1_DIRECTION  : 1; 
+    uint FLAG0_LIGHT1_POINT      : 1; 
+    uint FLAG0_LIGHT1_SPOT       : 1; 
+    uint FLAG0_LIGHT2_DIRECTION  : 1; 
+    uint FLAG0_LIGHT2_POINT      : 1; 
+    uint FLAG0_LIGHT2_SPOT       : 1; 
+    uint FLAG0_VERTEX_LOCAL      : 1; 
+    uint FLAG0_BIT14             : 1; //eboot has no entry for this bit
+    uint FLAG0_CONSTANTCOLOR     : 1; 
+    uint FLAG0_TEXCOORD0IN       : 1; 
+    uint FLAG0_TEXCOORD1IN       : 1; 
+    uint FLAG0_TEXCOORD2IN       : 1; 
+    uint FLAG0_TEXCOORD0OUT      : 1; 
+    uint FLAG0_TEXCOORD1OUT      : 1; 
+    uint FLAG0_TEXCOORD2OUT      : 1; 
+    uint FLAG0_BIT22             : 1; //eboot has no entry for this bit
+    uint FLAG0_BLOOM             : 1; 
+    uint FLAG0_COLOR_OP_LERP     : 1; 
+    uint FLAG0_GRAYSCALE         : 1; 
+    uint FLAG0_ALPHAKILL         : 1; 
+    uint FLAG0_FLOAT_RENDER_TARGET : 1; 
+    uint FLAG0_OPAQUE_ALPHA1     : 1; 
+    uint FLAG0_DEFERRED          : 1; 
+    uint FLAG0_OUTLINE           : 1; 
+    uint FLAG0_MSAA              : 1;    
+}flag0types;
+
+typedef struct
+{
+    BitfieldRightToLeft();
+    uint FLAG1_MATERIAL_SHADOW : 1;
+    uint FLAG1_MATERIAL_AMBDIFF : 1;
+    uint FLAG1_MATERIAL_EMISSIVE : 1;
+    uint FLAG0_BIT3 : 1; //eboot has no entry for this bit
+    uint FLAG1_MATERIAL_SPECULAR : 1;
+    uint FLAG1_MATERIAL_FOG : 1;
+    uint FLAG1_MATERIAL_REFLECTION : 1;
+    uint FLAG1_MATERIAL_REFLECTION_LERP : 1;
+    uint FLAG1_MATERIAL_VERTEXCOLOR : 1;
+    uint FLAG1_MATERIAL_TRANSPARENCY : 1;
+    uint FLAG1_MATERIAL_DIFFUSIVITY : 1;
+    uint FLAG1_MATERIAL_LIGHT : 1;
+    uint FLAG1_MATERIAL_UV0TRANSFORM : 1;
+    uint FLAG1_MATERIAL_UV1TRANSFORM : 1;
+    uint FLAG1_MATERIAL_UV2TRANSFORM : 1;
+    uint FLAG1_MATERIAL_HEIGHTFOG : 1;
+    uint FLAG1_EDGE_REFERENCE_LIGHTALPHA : 1;
+    uint FLAG1_LIGHTMAP_MODULATE2 : 1;
+    uint FLAG1_MATERIAL_REFLECTION_ADD : 1;
+    uint FLAG0_BIT19 : 1; //eboot has no entry for this bit
+    uint FLAG0_BIT20 : 1; //eboot has no entry for this bit
+    uint FLAG0_BIT21 : 1; //eboot has no entry for this bit
+    uint FLAG1_TEXTURE1 : 1;
+    uint FLAG1_TEXTURE2 : 1;
+    uint FLAG1_TEXTURE3 : 1;
+    uint FLAG1_TEXTURE4 : 1;
+    uint FLAG1_TEXTURE5 : 1;
+    uint FLAG1_TEXTURE6 : 1;
+    uint FLAG1_TEXTURE7 : 1;
+    uint FLAG1_TEXTURE8 : 1;
+    uint FLAG1_TEXTURE9 : 1;
+    uint FLAG1_TEXTURE10 : 1;
+}flag1types;
+
+typedef struct
+{
+    BitfieldRightToLeft();
+    uint FLAG2_HDR_TONEMAP : 1;
+    uint FLAG2_HDR_STAR : 1;
+    uint FLAG2_LIGHTMAP_MODULATE : 1;
+    uint FLAG2_ATEST_NEVER : 1;
+    uint FLAG2_ATEST_EQUAL : 1;
+    uint FLAG2_ATEST_NOTEQUAL : 1;
+    uint FLAG2_ATEST_LESS_LEQUAL : 1;
+    uint FLAG2_ATEST_GREATER_GEQUAL : 1;
+    uint FLAG2_FAKE_REFLECTION : 1;
+    uint FLAG2_MATERIAL_MULTIPLE_SEMI : 1;
+    uint FLAG2_MATERIAL_MULTIPLE_ADD : 1;
+    uint FLAG2_MATERIAL_MULTIPLE_SUB : 1;
+    uint FLAG2_MATERIAL_MODULATE_FOG : 1;
+    uint FLAG2_EDGE_REFERENCE_NORMALMAP : 1;
+    uint FLAG2_SPECULAR_NORMALMAPALPHA : 1;
+    uint FLAG2_REFLECTION_CASTER : 1;
+    uint FLAG2_WATER_REFLECTION : 1;
+    uint FLAG2_WATER_REFRACTION : 1;
+    uint FLAG2_WATER_FRESNEL : 1;
+    uint FLAG2_EDGE_BACKLIGHT : 1;
+    uint FLAG2_EDGE_SEMITRANS : 1;
+    uint FLAG2_TOON_REFERENCE_NORMALMAP : 1;
+    uint FLAG2_TOON_REMOVAL_LIGHT_YAXIS : 1;
+    uint FLAG2_EDGE_CAVERNMAP : 1;
+    uint FLAG2_PCF_3x3 : 1;
+    uint FLAG2_PCF_4x4 : 1;
+    uint FLAG2_EDGE_REFERENCE_NORMALALPHA : 1;
+    uint FLAG2_EDGE_REFERENCE_DIFFUSEALPHA : 1;
+    uint FLAG2_VSM : 1;
+    uint FLAG2_PCF : 1;
+    uint FLAG2_CSM : 1;
+    uint FLAG2_SHADOWDEBUG : 1;
+}flag2types;
+
+typedef struct
+{
+    uint cg_instruction[4];
+}section0Entry;
+
+typedef struct
+{
+    string cgb_string;
+}cgb_string_entry<read=cgb_string, optimize=false>;
+
+typedef struct
+{
+    int unk00;
+    short unk04;
+    short unk06;
+}section1Entry<read=Str("%d, %d, %d", unk00, unk04, unk06)>;
+
+typedef struct
+{
+    char magic[4];
+    int unk04;
+    short section0Size;
+    short unk0a;
+    flag0types unk0c;
+    flag1types unk10;
+    flag2types unk14;
+    int unk18;
+    int unk1c;
+    section0Entry entry[section0Size/16];
+    int unknown[4];
+}cgb_section0;
+
+typedef struct
+{
+    short sectionSize;
+    short entryCount;
+    short unkEntryCount;
+    if (entryCount == 0)
+        return;
+    section1Entry entry[entryCount];
+    short unkEntry[unkEntryCount];
+    byte dummy; 
+    cgb_string_entry binding_semantic[entryCount];
+}cgb_section1;
+
+BigEndian();
+
+cgb_section0 section0;
+if (!FEof())
+    cgb_section1 section1;

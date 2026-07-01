@@ -92,7 +92,7 @@ typedef struct
 	s16 Map_Y_Offset;
 }texelem<read=Str("Texpack: %03d_%d || Bitflag: %05d", TexpackID, TexpackMapLayer, FlagConvert(flag))>;
 
-local int field00 = 0;
+local int field00 = -1;
 local int ddsIndex;
 
 typedef struct {
@@ -110,7 +110,7 @@ typedef struct {
 	{
 		Texture_Params = 0,
 		Area_Displacement = 1,
-		Nothing = 2,
+		Area_Displacement2 = 2,
 		White_Arrow_Down = 3,
 		Safe_Room = 4,
 		Persistent_Red_Exclamation_Mark = 5,
@@ -171,7 +171,7 @@ typedef struct {
 		
 		structRead = Str("%s || Flag %05d", IconId, FlagConvert( reqFlag ));
 	}
-	else if (MapIcon == 1 || MapIcon == 27 || MapIcon == 18)
+	else if (MapIcon == 1 || MapIcon == 2 || MapIcon == 27 || MapIcon == 18)
 	{
 		f32 mapPartX <name = "Map Part X">;
 		f32 mapPartY <name = "Map Part Y">;
@@ -204,12 +204,6 @@ typedef struct {
 		s32 Field44;
 		
 		structRead = Str("%s || Flag %05d", IconId, FlagConvert( reqFlag ));
-	}
-	else if ( MapIcon == 2 )
-	{
-		EntryName = Str("End of Map Layer %d", ddsIndex);
-		byte nolmao[68]<hidden=true>;
-		structRead = Str("End of Map Layer %d", ddsIndex);
 	}
 	else
 	{
@@ -263,16 +257,18 @@ struct
 			
 			default:
 			local int place = 0;
-			while (place < fileSize / 72)
+			while (fileSize - FTell() >= 72)
 			{
 				struct
 				{
-					while (field00 != 2 )
+					while (fileSize - FTell() >= 71)
 					{
 						partSegment data <optimize=false>;
+						
+						if (data.reqFlag == -2)
+							break;
 					}
 					
-					field00 = 0;
 					ddsIndex++;
 					local string s = Str("Minimap Layer Index %d", ddsIndex - 1);
 				}MapDDSIndex<name = s, optimize=false>;

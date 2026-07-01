@@ -1,0 +1,72 @@
+//------------------------------------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+// File Mask: *.map
+//------------------------------------------------------------------------------
+
+typedef char bool;
+typedef char s8;
+typedef uchar u8;
+typedef int16 s16;
+typedef uint16 u16;
+typedef int16 s16;
+typedef int32 s32;
+typedef uint32 u32;
+typedef int64 s64;
+typedef uint64 u64;
+typedef hfloat f16;
+typedef float f32;
+typedef double f64;
+
+BigEndian();
+
+typedef struct
+{
+    u16 FMaID<name="Field Major ID">;
+	uint16 FMiID<name="Field Minor ID">;
+	u8 Location1;
+	u8 Location2;
+	u8 Location3_maybe;
+	u8 Unknown;
+	u32 Unknown;
+	
+} EntryType1<name="Entry", read=(Str("Type 1   -   f%03i_%03i.GFS   ||   X: %g Z: %g", FMaID, FMiID, Location1, Location2)), optimize=false>;
+
+typedef struct
+{
+	u16 FMaID<name="Field Major ID">;
+	uint16 FMiID<name="Field Minor ID">;
+	u8 Location1;
+	u8 Location2;
+	u8 Location3_maybe;
+	u8 Unknown;
+	u32 Unknown;
+	u32 Unknown;
+
+} EntryType2<name="Entry", read=(Str("Type 2   -   f%03i_%03i.GFS   ||   X: %g Z: %g", FMaID, FMiID, Location1, Location2)), optimize=false>;
+
+struct MAPFile
+{
+    if ( ReadByte() == 0 )
+    {
+        BigEndian();
+    }
+    else
+    {
+        LittleEndian();
+    }
+    u32 Num_of_entries<name="Number of field models">;
+	u16 Unknown1;
+	u8 Unknown2;
+	u16 Unknown3;
+	u16 Unknown4;
+	u8 Unknown5;
+	u32 Unknown6;
+	if (Unknown4 == 0)
+	{
+		EntryType1 entry[ Num_of_entries ];
+	}
+	else
+	{
+		EntryType2 entry[ Num_of_entries ];
+	}
+}mapfile<name="MAP file">;

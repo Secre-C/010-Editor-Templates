@@ -67,7 +67,7 @@ typedef struct( string fileName )
     // Detect endianness
     BigEndian();
     local u32 magic = ReadUInt( tableStart + 4 );
-    if ( magic != 0x46544430 && magic != 0x77544430 )
+    if ( magic != 0x46544430 )
     {
         if ( magic == 0x30445446 )
         {
@@ -82,16 +82,8 @@ typedef struct( string fileName )
     u32 Field00 <name = "Field 00">;
     u32 Magic <name = "Magic">;
     u32 FileSize <name = "File Size">;
-    if (IsBigEndian())
-    {
-        u16 DataType <name = "Data Type">;
-        u16 DataCount <name = "Data Count">;
-    }
-    else
-    {
-        u16 DataCount <name = "Data Count">;
-        u16 DataType <name = "Data Type">;
-    }
+    u16 DataType <name = "Data Type">;
+    u16 DataCount <name = "Data Count">;
     u32 DataOffsets[ DataCount ] <name = "Data Offsets">;
 
     local u32 x;
@@ -239,42 +231,6 @@ typedef struct( u32 entrySize, string fileName )
 {
     SetRandomBackColor();
 	local string readString;
-	
-	if (fileExt == ".pol" || fileExt == ".POL")
-	{
-		Bitflag Enabling_Bitflags[10];
-		Bitflag Disabling_Bitflags[10];
-		u8 unk50;
-		u8 unk51;
-		u8 unk52;
-		u8 unk53;
-		u8 unk54;
-		u8 unk55;
-		s16 unk56;
-		s16 unk58;
-		s16 unk60;
-		s8 unk5C;
-		s8 unk5D;
-		s16 obj_model_major;
-		s16 obj_model_minor;
-		s16 unk62;
-		s32 obj_reshnd;
-		s16 pol_id;
-		s16 anim_maybe;
-		u8 unk6B;
-		u8 unk6C;
-		s16 entrance_id;
-		s32 x_pos; 
-		s32 y_pos;
-		s32 z_pos;
-		s32 x_rot;
-		s32 y_rot;
-		s32 z_rot;
-		s16 unk88;
-		s16 unk8A;
-		readString = Str("m%03d_%03d.GMD, pol_id -> %d, entrance_id -> %d, mode -> %d : %d", obj_model_major, obj_model_minor, pol_id, entrance_id, unk6B, unk6C);
-		return;
-	}
     switch ( fileName )
     {
         case "datEncountPack":
@@ -595,7 +551,7 @@ typedef struct
     u8 Field01 <name = "Field 01">;
     u8 Field02 <name = "Field 02">; Assert( Field02 == 0 );
     u8 Field03 <name = "Field 03">; Assert( Field03 == 0 );
-    u8 Data[ Length ] <name = "Data">;
+    u8 Data[ Align( Length, 16 ) ] <name = "Data">;
 } FtdString <read=FtdStringToString, write=FtdStringFromString>;
 
 string FtdStringToString( struct FtdString& str )

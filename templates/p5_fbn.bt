@@ -314,7 +314,15 @@ typedef struct
 typedef struct
 {
     CherryRandomColor();
-    u32 Unk00;
+	u16 unk00;
+	u8 unk02;
+	struct
+    {
+        u8 bit00 : 1; u8 HideThirdEyeHint : 1; u8 bit02 : 1; u8 bit03 : 1; 
+        u8 bit04 : 1; u8 bit05 : 1; u8 bit06 : 1; u8 bit07 : 1; 
+        
+    } grappleTriggerProperties;
+	
     local short TypeValue00 = ReadShort();
     local short TypeValue01 = ReadShort(FTell()+2);
     struct

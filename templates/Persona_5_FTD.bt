@@ -127,8 +127,8 @@ typedef struct
 	char fldName[32] <name = "Field Name">;
 	u16 fldMajor <name = "Field Major ID">;
 	u16 fldMinor <name = "Field Minor ID">;
+	u16 mapLayer <name = "Minimap Layer">;
 	u16 fldEntrance <name = "FBN Entrance ID">;
-	u16 fldSub <name = "Field Sub ID">; 
 	u16 Field28 <name = "bf Procedure Index">;
 	travelType Travel_Type <name = "Travel Type">;
 	u16 Field2C;
@@ -484,9 +484,10 @@ typedef struct( u32 entrySize, string fileName )
 			u8 unk0;
 			s16 unk01;
 			s16 unk1;
-			s16 unk2;
-			s32 unk3;
-			s16 unk4;
+			s16 joker_x_offset;
+			s16 joker_y_offset;
+			s16 joker_z_offset;
+			s16 joker_y_rot;
 			s16 unk5;
 			s32 unk6;
 			//readString=Str("m%03d_%03d || PlayerAnim Gap ID -> %d", fldObjMajorId, fldObjMinorId, fldAnimGapID);

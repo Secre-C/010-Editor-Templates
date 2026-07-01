@@ -1,0 +1,18 @@
+//---------------------------------------------
+// Type definition
+//---------------------------------------------
+typedef ubyte u8;
+typedef short s16;
+typedef ushort u16;
+typedef uint u32;
+typedef float f32;
+
+LittleEndian();
+
+typedef struct
+{
+    u16 OutfitID;
+    u16 bgmID;
+} OutfitEntry<name="Outfit Info">;
+
+OutfitEntry File[FileSize()/4]<name="OUTFIT INFO", read=Str( "C00XX_%03d_00 -> BGM_%03d", this.OutfitID, this.bgmID )>;

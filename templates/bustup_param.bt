@@ -1,0 +1,34 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: bustup_param.dat
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "common/include.h"
+
+typedef struct
+{
+	SetRandomBackColor();
+    ushort majorId;
+    ushort minorId;
+    ushort subId;
+    ushort pad;
+    float BasePos_X;
+    float BasePos_Y;
+    float EyePos_X;
+    float EyePos_Y;
+    float MouthPos_X;
+    float MouthPos_Y;
+    short pad2;
+    short animType;
+	float pad3;
+}bup_entry<read=Str("b%03d_%03d_%02d", majorId, minorId, subId), optimize=false>;
+
+BigEndian();
+bup_entry entry[FileSize()/0x28];
