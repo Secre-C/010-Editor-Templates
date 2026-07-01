@@ -151,7 +151,8 @@ typedef struct
     int _unk0x68;   // argb color
     int _unk0x6C;   // argb color
     int _unk0x70;   // argb color
-    int _unk0x74;   // possibly padding
+    short Length;   
+    short Height;
     int _unk0x78;   // possibly padding
     int _unk0x7C;   // possibly padding
 

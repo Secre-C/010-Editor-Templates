@@ -1,0 +1,67 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.3 Binary Template
+//
+//      File: datmainpersonagrowth.tbl
+//   Authors: Lumi Platinum, Century_
+//   Version: 1.0
+//   Purpose: Parsing PQ's datmainpersonagrowth.tbl
+//  Category: Persona Q
+// File Mask: *.tbl
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+//------------------------------------------------
+// Includes pq_enums.bt for skill, persona, and user names.
+// Not sure exactly where else I should disclaim this,
+// but this file was derived from Century-300's
+// PQ2 versions of the same .bt and was developed
+// using info gained from aqiu384's resources.
+// Thanks to everyone involved who helped me indirectly!
+//------------------------------------------------
+#include "pq_enums.bt"
+
+// Skill structure.
+typedef struct {
+    ubyte Level <name = "Level Learned">;
+    SkillType Type;
+    PQBattleSkill Skill; 
+} SkillData <read=EnumToString(Skill)>;
+
+//Skill block structure.
+typedef struct {
+    for (ubyte g = 0; g < 32; g++)
+    {SkillData Skill;}
+} Skills;
+
+//Stat increase block structure
+typedef struct {
+    for (ubyte g = 2; g < 100; g++) {
+    struct {
+        local string Level = "Lv " + Str("%d", g);
+        local string Comment = 
+        "Stat increases from reaching " + Level;
+        int HPGrowth;
+        int SPGrowth;
+        int StGrowth;
+        int MaGrowth;
+        int EnGrowth;
+        int AgGrowth;
+        int LuGrowth;
+    } LevelUpStats <name=Level, comment=Comment>;
+}} StatIncreases;
+
+// Main Persona structure.
+typedef struct (short i) {
+    local PersonaName Name = i;
+    PersonaUser User;
+    short Levels <name = "Levels Available">;
+    Skills PersonaSkills <name = "Persona Skills">;
+    StatIncreases StatBlock <name = "Level Up Stats">; 
+} PersonaData <read=EnumToString(Name)>;
+
+//Main Personas.
+struct {
+    for (short g = 240; g < 288; g++)
+    {PersonaData MainPersona(g);}
+} Personas;
